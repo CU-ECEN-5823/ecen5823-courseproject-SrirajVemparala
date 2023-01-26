@@ -35,8 +35,8 @@
  *
  *
  *
- * Student edit: Add your name and email address here:
- * @student    Awesome Student, Awesome.Student@Colorado.edu
+ *
+ * @student    Raghu Sai Phani Sriraj Vemparala, raghu.vemparala@colorado.edu
  *
  *
  *
@@ -159,7 +159,7 @@ SL_WEAK void app_init(void)
   // This is called once during start-up.
   // Don't call any Bluetooth API functions until after the boot event.
 
-  // Student Edit: Add a call to gpioInit() here
+  gpioInit();
 
 } // app_init()
 
@@ -196,16 +196,18 @@ SL_WEAK void app_process_action(void)
   // Notice: This function is not passed or has access to Bluetooth stack events.
   //         We will create/use a scheme that is far more energy efficient in
   //         later assignments.
-
+/*Provides 1 sec OFF Delay*/
   delayApprox(3500000);
-
+  /*Turn ON LED's 0 and 1*/
   gpioLed0SetOn();
-
+  gpioLed1SetOn();
+  /*Provides 1 sec ON Delay*/
   delayApprox(3500000);
-
+  /*Turn OFF LED's 0 and 1*/
   gpioLed0SetOff();
+  gpioLed1SetOff();
 
-} // app_process_action()
+}
 
 
 
