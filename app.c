@@ -59,7 +59,8 @@
 #include "src/ble_device_type.h"
 #include "src/gpio.h"
 #include "src/lcd.h"
-
+#include "src/oscillators.h"
+#include "src/timer.h"
 
 // Students: Here is an example of how to correctly include logging functions in
 //           each .c file.
@@ -73,8 +74,7 @@
 #include "src/log.h"
 
 
-
-
+extern bool uf_int;
 // *************************************************
 // Power Manager
 // *************************************************
@@ -94,8 +94,11 @@
 // Students: We'll need to modify this for A2 onward so that compile time we
 //           control what the lowest EM (energy mode) the MCU sleeps to. So
 //           think "#if (expression)".
+#if LOWEST_ENERGY_MODE == 0
 #define APP_IS_OK_TO_SLEEP      (false)
-//#define APP_IS_OK_TO_SLEEP      (true)
+#elif ((LOWEST_ENERGY_MODE == 1) || (LOWEST_ENERGY_MODE == 2) || (LOWEST_ENERGY_MODE == 3))
+#define APP_IS_OK_TO_SLEEP      (true)
+#endif
 
 
 // Return values for app_sleep_on_isr_exit():
@@ -120,8 +123,6 @@
 //#define APP_SLEEP_ON_ISR_EXIT   (SL_POWER_MANAGER_WAKEUP)
 
 #endif // defined(SL_CATALOG_POWER_MANAGER_PRESENT)
-
-
 
 
 // *************************************************
@@ -151,43 +152,53 @@ sl_power_manager_on_isr_exit_t app_sleep_on_isr_exit(void)
 
 
 /**************************************************************************//**
- * Application Init.
+ * @Function SL_WEAK void app_init()
+ * @Description: Application initialization
+ * @Param NULL
+ * @Return NULL
  *****************************************************************************/
 SL_WEAK void app_init(void)
 {
   // Put your application 1-time initialization code here.
   // This is called once during start-up.
   // Don't call any Bluetooth API functions until after the boot event.
-
+  sl_power_manager_add_em_requirement(LOWEST_ENERGY_MODE);
   gpioInit();
+  cmu_init();
+  init_LETIMER0();
+  NVIC_ClearPendingIRQ(LETIMER0_IRQn);
+  NVIC_EnableIRQ(LETIMER0_IRQn);
 
 } // app_init()
 
 
 
 
-/*****************************************************************************
- * delayApprox(), private to this file.
- * A value of 3500000 is ~ 1 second. After assignment 1 you can delete or
- * comment out this function. Wait loops are a bad idea in general.
- * We'll discuss how to do this a better way in the next assignment.
- *****************************************************************************/
-static void delayApprox(int delay)
-{
-  volatile int i;
-
-  for (i = 0; i < delay; ) {
-      i=i+1;
-  }
-
-} // delayApprox()
-
-
+///*****************************************************************************
+// * delayApprox(), private to this file.
+// * A value of 3500000 is ~ 1 second. After assignment 1 you can delete or
+// * comment out this function. Wait loops are a bad idea in general.
+// * We'll discuss how to do this a better way in the next assignment.
+// *****************************************************************************/
+//static void delayApprox(int delay)
+//{
+//  volatile int i;
+//
+//  for (i = 0; i < delay; ) {
+//      i=i+1;
+//  }
+//
+//} // delayApprox()
 
 
 
-/**************************************************************************//**
- * Application Process Action.
+
+
+/**************************************************************************
+ * @Function SL_WEAK void app_process_action(void)
+ *  @Description LED toggling
+ * @Param NULL
+ * @Return NULL
  *****************************************************************************/
 SL_WEAK void app_process_action(void)
 {
@@ -196,17 +207,17 @@ SL_WEAK void app_process_action(void)
   // Notice: This function is not passed or has access to Bluetooth stack events.
   //         We will create/use a scheme that is far more energy efficient in
   //         later assignments.
-/*Provides 1 sec OFF Delay*/
-  delayApprox(3500000);
-  /*Turn ON LED's 0 and 1*/
-  gpioLed0SetOn();
-  gpioLed1SetOn();
-  /*Provides 1 sec ON Delay*/
-  delayApprox(3500000);
-  /*Turn OFF LED's 0 and 1*/
-  gpioLed0SetOff();
-  gpioLed1SetOff();
+  if(uf_int)
+  {
+      /*Turn ON LED's 0*/
+      gpioLed0SetOn();
+  }
+  else
+  {
+      /*Turn OFF LED's 1*/
+      gpioLed0SetOff();
 
+  }
 }
 
 
