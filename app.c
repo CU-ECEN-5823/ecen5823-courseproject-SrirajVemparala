@@ -46,6 +46,7 @@
 #include "sl_bluetooth.h"
 #include "gatt_db.h"
 #include "app.h"
+#include "src/i2c.h"
 
 
 // *************************************************
@@ -61,6 +62,7 @@
 #include "src/lcd.h"
 #include "src/oscillators.h"
 #include "src/timer.h"
+#include "src/scheduler.h"
 
 // Students: Here is an example of how to correctly include logging functions in
 //           each .c file.
@@ -74,7 +76,7 @@
 #include "src/log.h"
 
 
-extern bool uf_int;
+
 // *************************************************
 // Power Manager
 // *************************************************
@@ -162,7 +164,7 @@ SL_WEAK void app_init(void)
   // Put your application 1-time initialization code here.
   // This is called once during start-up.
   // Don't call any Bluetooth API functions until after the boot event.
-  sl_power_manager_add_em_requirement(LOWEST_ENERGY_MODE);
+  //sl_power_manager_add_em_requirement(LOWEST_ENERGY_MODE);
   gpioInit();
   cmu_init();
   init_LETIMER0();
@@ -207,17 +209,24 @@ SL_WEAK void app_process_action(void)
   // Notice: This function is not passed or has access to Bluetooth stack events.
   //         We will create/use a scheme that is far more energy efficient in
   //         later assignments.
-  if(uf_int)
-  {
-      /*Turn ON LED's 0*/
-      gpioLed0SetOn();
-  }
-  else
-  {
-      /*Turn OFF LED's 1*/
-      gpioLed0SetOff();
-
-  }
+  uint32_t evt;
+   evt = getNextEvent();
+   switch (evt) {
+   case evtLETimer_UF:
+       read_temp_from_si7021();
+   break;
+   }
+//  if(uf_int)
+//  {
+//      /*Turn ON LED's 0*/
+//      gpioLed0SetOn();
+//  }
+//  else
+//  {
+//      /*Turn OFF LED's 1*/
+//      gpioLed0SetOff();
+//
+//  }
 }
 
 

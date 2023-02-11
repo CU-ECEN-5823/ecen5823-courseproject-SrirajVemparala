@@ -14,6 +14,9 @@
 #include "timer.h"
 #include "oscillators.h"
 
+
+#define INCLUDE_LOG_DEBUG 1
+#include "src/log.h"
 /**********
  * @Function void initLETIMER0()
  * @Description LETIMER0 Timer Initialization
@@ -42,11 +45,11 @@ LETIMER_Init(LETIMER0, &letimerInitData);
 // calculate and load COMP0 (top)
 LETIMER_CompareSet(LETIMER0, 0, COMP0);     //Set COMP0 value
 // calculate and load COMP1
-LETIMER_CompareSet(LETIMER0, 1, COMP1);     //Set COMP1 value
+//LETIMER_CompareSet(LETIMER0, 1, COMP1);     //Set COMP1 value
 // Clear all IRQ flags in the LETIMER0 IF status register
 LETIMER_IntClear(LETIMER0, 0xFFFFFFFF); // punch them all down
 // Set UF and COMP1 in LETIMER0_IEN, so that the timer will generate IRQs to the NVIC.
-temp = LETIMER_IEN_UF | LETIMER_IEN_COMP1;
+temp = LETIMER_IEN_UF; //| LETIMER_IEN_COMP1;
 LETIMER_IntEnable (LETIMER0, temp); // Make sure you have defined the ISR routine LETIMER0_IRQHandler()
 // Enable the timer to starting counting down, set LETIMER0_CMD[START] bit, see LETIMER0_STATUS[RUNNING] bit
 LETIMER_Enable(LETIMER0, true);
@@ -56,3 +59,27 @@ LETIMER_Enable(LETIMER0, true);
 //temp = LETIMER_CounterGet(LETIMER0);
 //temp = LETIMER_CounterGet(LETIMER0);
 } // initLETIMER0 ()
+
+void timerdelay(uint32_t time)
+{
+  uint32_t temp;
+  /*Boundary condition check*/
+  if((one_milli_in_microseconds <= time)&&(time <= countervalue_milli_in_microseconds))
+  {
+      temp = LETIMER_CounterGet(LETIMER0);
+  if(temp < (time/1000))//Condition if current time is less than available count
+  {
+      time = temp-time+COMP0;
+  }
+      while(((temp - (LETIMER_CounterGet(LETIMER0)))*1000) < time)
+      {
+          //LOG_INFO("temp is =%u\n\r",temp);
+          //LOG_INFO("counter is =%u\n\r",LETIMER_CounterGet(LETIMER0));
+      }
+  }
+  else
+  {
+   /*Do Nothing and Return*/
+      LOG_INFO("TIMER NOT IN RANGE");
+  }
+}

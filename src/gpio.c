@@ -35,6 +35,12 @@
 #define LED0_pin   4
 #define LED1_port  gpioPortF
 #define LED1_pin   5
+#define Si7021_EN_port gpioPortD
+#define Si7021_EN_pin  15
+#define Si7021_SCL_port gpioPortC
+#define Si7021_SCL_pin  10
+#define Si7021_SDA_port gpioPortC
+#define Si7021_SDA_pin  11
 
 
 /*Function Name: gpioInit()
@@ -54,7 +60,7 @@ void gpioInit()
 	//GPIO_DriveStrengthSet(LED1_port, gpioDriveStrengthWeakAlternateWeak);
 	/*Setting the LED0 pin to push pull configuration*/
 	//GPIO_PinModeSet(LED1_port, LED1_pin, gpioModePushPull, false);
-
+  GPIO_PinModeSet( Si7021_EN_port, Si7021_EN_pin, gpioModePushPull, true );
 
 
 }
@@ -91,8 +97,36 @@ void gpioLed1SetOff()
 	GPIO_PinOutClear(LED1_port,LED1_pin);
 }
 
+/*Function Name: gpioSi7021sensorOn()
+Function use: Turn ON Sensor power supply /
+return type: void*/
+void gpioSi7021sensorOn()
+{
+  GPIO_PinOutSet(Si7021_EN_port,Si7021_EN_pin);
+}
 
+/*Function Name: gpioSi7021sensorOff()
+Function use: Turn OFF Sensor power supply /
+return type: void*/
+void gpioSi7021sensorOff()
+{
+  GPIO_PinOutClear(Si7021_EN_port,Si7021_EN_pin);
+}
 
+/*Function Name: gpioSi7021_SCL_Disable()
+Function use: Power Down SCL line /
+return type: void*/
+void gpioSi7021_SCL_Disable()
+{
+  GPIO_PinOutClear(Si7021_SCL_port,Si7021_SCL_pin);
+}
 
+/*Function Name: gpioSi7021_SDA_Disable()
+Function use: Power Down SCL line /
+return type: void*/
+void gpioSi7021_SDA_Disable()
+{
+  GPIO_PinOutClear(Si7021_SDA_port,Si7021_SDA_pin);
+}
 
 

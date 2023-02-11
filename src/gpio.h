@@ -37,9 +37,10 @@ void gpioLed0SetOn();
 void gpioLed0SetOff();
 void gpioLed1SetOn();
 void gpioLed1SetOff();
-
-
-
+void gpioSi7021sensorOn();
+void gpioSi7021sensorOff();
+void gpioSi7021_SCL_Disable();
+void gpioSi7021_SDA_Disable();
 
 
 #endif /* SRC_GPIO_H_ */
