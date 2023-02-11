@@ -8,19 +8,25 @@ See [Mastering Markdown](https://guides.github.com/features/mastering-markdown/)
 1. What is the average current per period?
    Answer: 156.13uA
    <br>Screenshot:  
-   ![Avg_current_per_period](screenshots/avgcyclecurrent.jpg)  
+   ![avgcyclecurrent][avgcyclecurrent]  
    
 2. What is the average current when the Si7021 is Powered Off?  
    Answer: 1.97uA
    <br>Screenshot:  
-   ![Avg_current_lpmOFF](screenshots/average_current_power_off.jpg)
+   ![average_current_power_off][average_current_power_off]
    
 3. What is the average current when the Si7021 is Powered On?  
    Answer: 4.64mA
    <br>Screenshot:  
-   ![Avg_current_lpmON](screenshots/avgcurrentonSi7021.jpg)
+   ![avgcurrentonSi7021][avgcurrentonSi7021]
    
 4. How long is the Si7021 Powered On for 1 temperature reading?  
    Answer: 97 milli seconds
    <br>Screenshot:
-   ![Time_lpmON](screenshots/si7021ontime.jpg)
+   ![si7021ontime][si7021ontime]
+
+
+[avgcyclecurrent]: screenshots/avgcyclecurrent.jpg "avgcyclecurrent"
+[average_current_power_off]: screenshots/average_current_power_off.jpg "average_current_power_off"
+[avgcurrentonSi7021]: screenshots/avgcurrentonSi7021.jpg "avgcurrentonSi7021"
+[si7021ontime]: screenshots/si7021ontime.jpg "si7021ontime"
