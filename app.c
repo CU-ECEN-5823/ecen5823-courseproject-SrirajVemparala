@@ -72,7 +72,7 @@
 //           to call one of the LOG_***() functions from.
 
 // Include logging specifically for this .c file
-#define INCLUDE_LOG_DEBUG 1
+#define INCLUDE_LOG_DEBUG 0
 #include "src/log.h"
 
 
@@ -209,13 +209,15 @@ SL_WEAK void app_process_action(void)
   // Notice: This function is not passed or has access to Bluetooth stack events.
   //         We will create/use a scheme that is far more energy efficient in
   //         later assignments.
-  uint32_t evt;
+  uint32_t evt = 0;
+ // LOG_INFO("Entering Inappprocessaction\n\r");
    evt = getNextEvent();
-   switch (evt) {
-   case evtLETimer_UF:
-       read_temp_from_si7021();
-   break;
-   }
+   temperature_state_machine(evt);
+//   switch (evt) {
+//   case evtLETimer_UF:
+//       read_temp_from_si7021();
+//   break;
+//   }
 //  if(uf_int)
 //  {
 //      /*Turn ON LED's 0*/

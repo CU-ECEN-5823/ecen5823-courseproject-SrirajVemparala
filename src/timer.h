@@ -30,5 +30,6 @@
 #endif
 void init_LETIMER0();
 void timerdelay(uint32_t);
+void timerwaitus_irq(uint32_t);
 
 #endif /* SRC_TIMER_H_ */

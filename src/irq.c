@@ -9,11 +9,14 @@
  ******************************************************************************/
 #include "irq.h"
 #include "em_letimer.h"
+#include "em_i2c.h"
 #include  <stdbool.h>
+#include "src/scheduler.h"
+#define INCLUDE_LOG_DEBUG 1
+#include "src/log.h"
 
-
-bool uf_int = true;//Check if underflow and COMP1 flag is set to control the LED ON and OFF
-
+//bool uf_int = true;//Check if underflow and COMP1 flag is set to control the LED ON and OFF
+uint32_t log_timer = 0;
 /*************
  * @Function void LETIMER0_IRQHandler()
  * @Description Used as LETIMER0 Interrupt Handler
@@ -22,14 +25,46 @@ bool uf_int = true;//Check if underflow and COMP1 flag is set to control the LED
  *************/
 void LETIMER0_IRQHandler(void)
 {
-  uint32_t flag_value;//Obtains interrupt flags
-  flag_value = LETIMER_IntGet(LETIMER0);//Get flag info
+  uint32_t flag_value = 0;//Obtains interrupt flags
+  flag_value = LETIMER_IntGetEnabled(LETIMER0);//Get flag info
   LETIMER_IntClear(LETIMER0,flag_value);
   //Check if COMP1 interrupt is set
   //Check if UF interrupt is set
  if((flag_value&LETIMER_IF_UF))
   {
+     log_timer++;
      //Schedule the Event Temperature measurement
      schedulerSetEventTemperaturemeasurement();
   }
+ if((flag_value&LETIMER_IF_COMP1))
+ {
+     schedulerSetEventcomp1set();
+ }
+}
+
+/*************
+ * @Function void I2C0_IRQHandler()
+ * @Description Used as LETIMER0 Interrupt Handler
+ * @Param NULL
+ * @Return NULL
+ *************/
+void I2C0_IRQHandler(void) {
+  // this can be locally defined
+  I2C_TransferReturn_TypeDef  transferStatus;
+  transferStatus = I2C_Transfer(I2C0);
+  if (transferStatus == i2cTransferDone)
+  {
+      //LOG_INFO("i2cd\n\r");
+      schedulerSetEventi2cTransferDone();
+      //NVIC_DisableIRQ(I2C0_IRQn);//Should not be used in IRQ
+  }
+  if (transferStatus < 0)
+  {
+      LOG_ERROR("%d\n\r", transferStatus);
+  }
+}
+
+int letimerMilliseconds()
+{
+  return (log_timer*3000);
 }

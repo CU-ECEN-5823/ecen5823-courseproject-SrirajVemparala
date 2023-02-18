@@ -8,11 +8,10 @@
 #ifndef SRC_SCHEDULER_H_
 #define SRC_SCHEDULER_H_
 #include "stdint.h"
-typedef enum
-{
-  evtLETimer_UF = 1
-}eventInterruptflag;
+
 void schedulerSetEventTemperaturemeasurement();
 uint32_t getNextEvent();
-
+void temperature_state_machine(uint32_t);
+void schedulerSetEventcomp1set();
+void schedulerSetEventi2cTransferDone();
 #endif /* SRC_SCHEDULER_H_ */

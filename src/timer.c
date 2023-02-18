@@ -15,7 +15,7 @@
 #include "oscillators.h"
 
 
-#define INCLUDE_LOG_DEBUG 1
+#define INCLUDE_LOG_DEBUG 0
 #include "src/log.h"
 /**********
  * @Function void initLETIMER0()
@@ -60,6 +60,12 @@ LETIMER_Enable(LETIMER0, true);
 //temp = LETIMER_CounterGet(LETIMER0);
 } // initLETIMER0 ()
 
+/*********************************************************************
+ * @Function void timerdelay()
+ * @Description provides the timer delay
+ * @Param uint32_t
+ * @Return NULL
+ **********************************************************************/
 void timerdelay(uint32_t time)
 {
   uint32_t temp;
@@ -67,10 +73,10 @@ void timerdelay(uint32_t time)
   if((one_milli_in_microseconds <= time)&&(time <= countervalue_milli_in_microseconds))
   {
       temp = LETIMER_CounterGet(LETIMER0);
-  if(temp < (time/1000))//Condition if current time is less than available count
-  {
-      time = temp-time+COMP0;
-  }
+      if(temp < (time/1000))//Condition if current time is less than available count
+      {
+          time = temp-time+COMP0;
+      }
       while(((temp - (LETIMER_CounterGet(LETIMER0)))*1000) < time)
       {
           //LOG_INFO("temp is =%u\n\r",temp);
@@ -81,5 +87,34 @@ void timerdelay(uint32_t time)
   {
    /*Do Nothing and Return*/
       LOG_INFO("TIMER NOT IN RANGE");
+  }
+}
+
+/*********************************************************************
+ * @Function void timerwaitus_irq()
+ * @Description Sets the COMP1 value, enables interrupt for comp1
+ * @Param uint32_t
+ * @Return NULL
+ **********************************************************************/
+void timerwaitus_irq(uint32_t comp1_value)
+{
+  uint32_t temp = LETIMER_CounterGet(LETIMER0);
+
+  if((one_milli_in_microseconds <= comp1_value)&&(comp1_value <= countervalue_milli_in_microseconds))
+  {
+      if(temp < (comp1_value/1000))//Condition if current time is less than available count
+      {
+          comp1_value = temp-(comp1_value/1000)+COMP0;
+      }
+      else
+      {
+          comp1_value = temp - (comp1_value/1000);
+      }
+
+  temp = LETIMER_CompareGet(LETIMER0,1);
+  LETIMER_IntClear(LETIMER0, LETIMER_IFC_COMP1);
+  LETIMER_CompareSet(LETIMER0, 1, comp1_value);
+  LETIMER_IntEnable(LETIMER0, LETIMER_IEN_COMP1);
+  LETIMER0->IEN |= LETIMER_IEN_COMP1;
   }
 }

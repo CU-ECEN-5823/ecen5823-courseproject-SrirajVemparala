@@ -13,4 +13,5 @@
 
 #include "scheduler.h"
 
+int letimerMilliseconds();
 #endif /* SRC_IRQ_H_ */

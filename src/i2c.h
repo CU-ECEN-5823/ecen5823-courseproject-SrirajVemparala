@@ -17,9 +17,10 @@
 #define TEMP_READ_CMD 0xF3
 
 
+
 void I2C_init();
-I2C_TransferReturn_TypeDef i2c_write_cmd();
+void i2c_write_cmd();
 I2C_TransferReturn_TypeDef i2c_read_cmd();
-int read_temp_from_si7021();
+//int read_temp_from_si7021();
 void i2c_deinitialize();
 #endif /* SRC_I2C_H_ */

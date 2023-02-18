@@ -26,7 +26,7 @@
 // Include logging for this file
 #define INCLUDE_LOG_DEBUG 1
 #include "log.h"
-
+#include "irq.h"
 
 
 /**
@@ -42,8 +42,8 @@ uint32_t loggerGetTimestamp()
      //           assignments that require logging (a fancy printf).
      //           Put the letimerMilliseconds() function in your irq.c/.h files.
 
-     //return letimerMilliseconds();
-	   return (0);
+     return letimerMilliseconds();
+	   //return (0);
 	   
 } // loggerGetTimestamp
 
