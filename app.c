@@ -47,6 +47,7 @@
 #include "gatt_db.h"
 #include "app.h"
 #include "src/i2c.h"
+#include "sl_bt_api.h"
 
 
 // *************************************************
@@ -63,6 +64,7 @@
 #include "src/oscillators.h"
 #include "src/timer.h"
 #include "src/scheduler.h"
+#include "src/ble.h"
 
 // Students: Here is an example of how to correctly include logging functions in
 //           each .c file.
@@ -164,7 +166,7 @@ SL_WEAK void app_init(void)
   // Put your application 1-time initialization code here.
   // This is called once during start-up.
   // Don't call any Bluetooth API functions until after the boot event.
-  //sl_power_manager_add_em_requirement(LOWEST_ENERGY_MODE);
+  sl_power_manager_add_em_requirement(LOWEST_ENERGY_MODE);
   gpioInit();
   cmu_init();
   init_LETIMER0();
@@ -209,10 +211,10 @@ SL_WEAK void app_process_action(void)
   // Notice: This function is not passed or has access to Bluetooth stack events.
   //         We will create/use a scheme that is far more energy efficient in
   //         later assignments.
-  uint32_t evt = 0;
+  //uint32_t evt = 0;
  // LOG_INFO("Entering Inappprocessaction\n\r");
-   evt = getNextEvent();
-   temperature_state_machine(evt);
+   //evt = getNextEvent();
+   //temperature_state_machine(evt);
 //   switch (evt) {
 //   case evtLETimer_UF:
 //       read_temp_from_si7021();
@@ -249,17 +251,23 @@ void sl_bt_on_event(sl_bt_msg_t *evt)
 {
 
   // Just a trick to hide a compiler warning about unused input parameter evt.
-  (void) evt;
+  //(void) evt;
 
   // For A5 onward:
   // Some events require responses from our application code,
   // and don’t necessarily advance our state machines.
   // For A5 uncomment the next 2 function calls
-  // handle_ble_event(evt); // put this code in ble.c/.h
+   handle_ble_event(evt); // put this code in ble.c/.h
+  if(SL_BT_MSG_ID(evt->header) == sl_bt_evt_system_external_signal_id)
+  {
+    ble_data_struct_t *bleDataPtr = getBleDataPtr();
 
   // sequence through states driven by events
-  // state_machine(evt);    // put this code in scheduler.c/.h
-
+   if(bleDataPtr->flag_ok_to_send_htm_indications == true)
+   {
+       temperature_state_machine(evt);    // put this code in scheduler.c/.h
+   }
+  }
 
 } // sl_bt_on_event()
 

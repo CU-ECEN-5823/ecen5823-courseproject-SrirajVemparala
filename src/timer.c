@@ -75,7 +75,7 @@ void timerdelay(uint32_t time)
       temp = LETIMER_CounterGet(LETIMER0);
       if(temp < (time/1000))//Condition if current time is less than available count
       {
-          time = temp-time+COMP0;
+          time = temp-time+COMP0;//COMP0 is 24576
       }
       while(((temp - (LETIMER_CounterGet(LETIMER0)))*1000) < time)
       {
@@ -102,13 +102,13 @@ void timerwaitus_irq(uint32_t comp1_value)
 
   if((one_milli_in_microseconds <= comp1_value)&&(comp1_value <= countervalue_milli_in_microseconds))
   {
-      if(temp < (comp1_value/1000))//Condition if current time is less than available count
+      if(temp < ((comp1_value*CLOCK_FREQUENCY)/1000000))//Condition if current time is less than available count
       {
-          comp1_value = temp-(comp1_value/1000)+COMP0;
+          comp1_value = temp-((comp1_value*CLOCK_FREQUENCY)/1000000)+COMP0;//655.36
       }
       else
       {
-          comp1_value = temp - (comp1_value/1000);
+          comp1_value = temp - ((comp1_value*CLOCK_FREQUENCY)/1000000);
       }
 
   temp = LETIMER_CompareGet(LETIMER0,1);

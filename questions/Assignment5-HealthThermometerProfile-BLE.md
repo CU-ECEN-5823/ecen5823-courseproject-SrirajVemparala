@@ -10,21 +10,21 @@ See [Mastering Markdown](https://guides.github.com/features/mastering-markdown/)
    ![advertising_period](screenshots/assignment5/advertising_period.png)  
 
 2. What is the average current between advertisements?
-   Answer:
+   Answer:  2.12uA
    <br>Screenshot:  
    ![avg_current_between_advertisements](screenshots/assignment5/avg_current_between_advertisements.png)  
 
 3. What is the peak current of an advertisement? 
-   Answer:
+   Answer:  27.95mA
    <br>Screenshot:  
    ![peak_current_of_advertisement](screenshots/assignment5/peak_current_of_advertisement.png)  
 
-4. Provide screen shot showing the connection interval settings. Do they match the values you set in your slave(server) code or the master's(client) values?.
+4. Provide screen shot showing the connection interval settings. Do they match the values you set in your slave(server) code or the master's(client) values?. The connection interval matches with the client.
    <br>Screenshot: 
    ![connection_interval](screenshots/assignment5/connection_interval.png)  
 
 5. What is the average current between connection intervals?
-   Answer:
+   Answer: 0.9uA
    <br>Screenshot:  
    ![avg_current_between_connection_intervals](screenshots/assignment5/avg_current_between_connection_intervals.png)  
 
@@ -33,12 +33,20 @@ See [Mastering Markdown](https://guides.github.com/features/mastering-markdown/)
    ![slave_latency](screenshots/assignment5/slave_latency.png)  
 
 7. What is the peak current of a data transmission when the phone is connected and placed next to the Blue Gecko? 
-   Answer:
+   Answer:21.28mA
    <br>Screenshot:  
    ![peak_current_phone_next_to](screenshots/assignment5/peak_current_phone_next_to.png)  
    
 8. What is the peak current of a data transmission when the phone is connected and placed approximately 20 feet away from the Blue Gecko? 
-   Answer:
+   Answer: 23.54mA
    <br>Screenshot:  
    ![peak_current_phone_20ft_away](screenshots/assignment5/peak_current_phone_20ft_away.png)  
    
+[advertising_period]: screenshots/assignment5/advertising_period.PNG "advertising_period"
+   [avg_current_between_advertisements]:screenshots/assignment5/avg_current_between_advertisements.PNG "avg_current_between_advertisements"
+   [peak_current_of_advertisement]:screenshots/assignment5/peak_current_of_advertisement.PNG "peak_current_of_advertisement"
+   [connection_interval]:screenshots/assignment5/connection_interval.PNG "connection_interval"   
+   [avg_current_between_connection_intervals]:screenshots/assignment5/avg_current_between_connection_intervals.PNG "avg_current_between_connection_intervals"
+   [slave_latency]:screenshots/assignment5/slave_latency.PNG "slave_latency"
+   [peak_current_phone_next_to]:screenshots/assignment5/peak_current_phone_next_to.PNG "peak_current_phone_next_to"
+   [peak_current_phone_20ft_away]:screenshots/assignment5/peak_current_phone_20ft_away.PNG "peak_current_phone_20ft_away"

@@ -26,8 +26,8 @@ void i2c_deinitialize()
 {
   I2C_Reset(I2C0);
   I2C_Enable(I2C0,false);
-  void gpioI2C_SCL_Disable();
-  void gpioI2C_SDA_Disable();
+  gpioSi7021_SCL_Disable();
+  gpioSi7021_SDA_Disable();
  //LOG_INFO("Deinitilaisation exit");
 }
 
