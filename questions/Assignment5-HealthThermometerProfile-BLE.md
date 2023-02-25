@@ -42,7 +42,7 @@ See [Mastering Markdown](https://guides.github.com/features/mastering-markdown/)
    <br>Screenshot:  
    ![peak_current_phone_20ft_away][peak_current_phone_20ft_away] 
    
-[advertising_period]: screenshots/assignment5/advertising_period.PNG "advertising_period"
+[advertising_period]:screenshots/assignment5/advertising_period.PNG "advertising_period"
    [avg_current_between_advertisements]:screenshots/assignment5/avg_current_between_advertisements.PNG "avg_current_between_advertisements"
    [peak_current_of_advertisement]:screenshots/assignment5/peak_current_of_advertisement.PNG "peak_current_of_advertisement"
    [connection_interval]:screenshots/assignment5/connection_interval.PNG "connection_interval"   
