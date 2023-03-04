@@ -318,7 +318,7 @@ void displayInit()
     timer_response = sl_bt_system_set_soft_timer(ONE_SECOND,HANDLE,CONTINUOUS_TIMER);
     if (timer_response != SL_STATUS_OK)
     {
-       LOG_ERROR("error occured in timer response");
+       LOG_ERROR("Error in timer response");
     }
 
 } // displayInit()

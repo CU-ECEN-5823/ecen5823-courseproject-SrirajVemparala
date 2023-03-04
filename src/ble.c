@@ -167,7 +167,7 @@ void handle_ble_event(sl_bt_msg_t *evt) {
     case sl_bt_evt_system_soft_timer_id:
       if(evt->data.evt_system_soft_timer.handle==0)
       {
-               displayUpdate();
+          displayUpdate();
       }
       break;
 
