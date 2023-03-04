@@ -41,6 +41,8 @@
 #define Si7021_SCL_pin  10
 #define Si7021_SDA_port gpioPortC
 #define Si7021_SDA_pin  11
+#define LCD_PORT  gpioPortD
+#define LCD_PIN   13
 
 
 /*Function Name: gpioInit()
@@ -129,4 +131,14 @@ void gpioSi7021_SDA_Disable()
   GPIO_PinOutClear(Si7021_SDA_port,Si7021_SDA_pin);
 }
 
-
+void gpioSetDisplayExtcomin(bool extcomin_state)
+{
+  if(extcomin_state == true)
+  {
+      GPIO_PinOutSet(LCD_PORT, LCD_PIN);
+  }
+  else
+  {
+      GPIO_PinOutClear(LCD_PORT, LCD_PIN);
+  }
+}

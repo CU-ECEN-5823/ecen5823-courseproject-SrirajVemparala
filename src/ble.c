@@ -10,6 +10,7 @@
 #include "src/ble.h"
 #include "sl_bt_api.h"
 #include "gatt_db.h"
+#include "src/lcd.h"
 /*******LOG MACRO AND HEADER*******/
 #define INCLUDE_LOG_DEBUG 1
 #include "src/log.h"
@@ -43,7 +44,8 @@ ble_data_struct_t* getBleDataPtr() {
 void handle_ble_event(sl_bt_msg_t *evt) {
 
   ble_data_struct_t *bleDataPtr = getBleDataPtr();
-  switch (SL_BT_MSG_ID(evt->header)) {
+  switch (SL_BT_MSG_ID(evt->header))
+  {
     // ******************************************************
     // Events common to both Servers and Clients
     // ******************************************************
@@ -54,11 +56,21 @@ void handle_ble_event(sl_bt_msg_t *evt) {
     // --------------------------------------------------------
     case sl_bt_evt_system_boot_id://Opening advertising connection and Initializing advertising
       // handle boot event
+      displayInit();
+      displayPrintf(DISPLAY_ROW_NAME, "Server");
+      displayPrintf(DISPLAY_ROW_ASSIGNMENT, "A6");
       sc = sl_bt_system_get_identity_address(&bleDataPtr->myAddress, &bleDataPtr->myAddressType);
       if(sc != SL_STATUS_OK)
         {
           LOG_ERROR("sl_bt_system_get_identity_address() returned != 0 status=0x%04x", (unsigned int) sc);
           break;
+        }
+      else
+        {
+          displayPrintf(DISPLAY_ROW_BTADDR, "%x:%x:%x:%x:%x:%x",
+                        bleDataPtr->myAddress.addr[0], bleDataPtr->myAddress.addr[1],
+                        bleDataPtr->myAddress.addr[2], bleDataPtr->myAddress.addr[3],
+                        bleDataPtr->myAddress.addr[4], bleDataPtr->myAddress.addr[5]);
         }
       sc=sl_bt_advertiser_create_set(&bleDataPtr->advertisingSetHandle);
       if (sc != SL_STATUS_OK)
@@ -77,6 +89,8 @@ void handle_ble_event(sl_bt_msg_t *evt) {
         {
           LOG_ERROR("sl_bt_advertiser_start() returned != 0 status=0x%04x", (unsigned int) sc);
         }
+      displayPrintf(DISPLAY_ROW_CONNECTION, "Advertising");
+
       break;
     case sl_bt_evt_connection_opened_id://Connection established
       bleDataPtr->ble_connection_handle=evt->data.evt_connection_opened.connection;
@@ -92,7 +106,11 @@ void handle_ble_event(sl_bt_msg_t *evt) {
           LOG_ERROR("sl_bt_connection_set_parameters() returned != 0 status=0x%04x", (unsigned int) sc);
           break;
         }
-      bleDataPtr->flag_connection_open_close = true;
+      else
+        {
+          bleDataPtr->flag_connection_open_close = true;
+          displayPrintf(DISPLAY_ROW_CONNECTION, "Connected" );
+        }
       break; // handle open event
     case sl_bt_evt_connection_closed_id://Closing Connection. Happens when bluetooth is disconnected
       sc=sl_bt_advertiser_start(bleDataPtr->advertisingSetHandle,sl_bt_advertiser_general_discoverable,sl_bt_advertiser_connectable_scannable);
@@ -101,10 +119,15 @@ void handle_ble_event(sl_bt_msg_t *evt) {
           LOG_ERROR("sl_bt_advertiser_start() returned != 0 status=0x%04x", (unsigned int) sc);
           break;
         }
+      else
+        {
+          displayPrintf(DISPLAY_ROW_CONNECTION, "Advertising" );
+        }
       // handle close events
       bleDataPtr->flag_ok_to_send_htm_indications = false;
       bleDataPtr->flag_connection_open_close = false;
       bleDataPtr->flag_in_flight = false;
+      displayPrintf(DISPLAY_ROW_TEMPVALUE,"");
       break;
     case sl_bt_evt_connection_parameters_id://printing the connection values provided by the Client
       LOG_INFO("Interval = %d\n\r Latency = %d\n\r Timeout = %d\n\r",(int)((evt->data.evt_connection_parameters.interval)*1.25),
@@ -115,6 +138,7 @@ void handle_ble_event(sl_bt_msg_t *evt) {
       if(evt->data.evt_gatt_server_characteristic_status.client_config_flags == sl_bt_gatt_server_disable)
         {
           bleDataPtr->flag_ok_to_send_htm_indications = false;
+          displayPrintf(DISPLAY_ROW_TEMPVALUE,"");
         }
       else if(evt->data.evt_gatt_server_characteristic_status.client_config_flags == sl_bt_gatt_server_indication)
         {
@@ -140,6 +164,12 @@ void handle_ble_event(sl_bt_msg_t *evt) {
       bleDataPtr->flag_in_flight=false;
       break;
 
+    case sl_bt_evt_system_soft_timer_id:
+      if(evt->data.evt_system_soft_timer.handle==0)
+      {
+               displayUpdate();
+      }
+      break;
 
       // more case statements to handle other BT events
   } // end - switch
@@ -162,6 +192,7 @@ void ble_send_temp(uint32_t temperature_in_c)
   UINT32_TO_BITSTREAM(p, htm_temperature_flt);
   ble_data_struct_t *bleDataPtr = getBleDataPtr();
   sc=sl_bt_gatt_server_write_attribute_value(gattdb_temperature_measurement,0,5,htm_temperature_buffer);
+  displayPrintf(DISPLAY_ROW_TEMPVALUE, "temp=%d", temperature_in_c);
   if(bleDataPtr->flag_connection_open_close == true  && bleDataPtr->flag_ok_to_send_htm_indications == true)
   {
       if(bleDataPtr->flag_in_flight == false)

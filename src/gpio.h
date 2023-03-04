@@ -41,6 +41,7 @@ void gpioSi7021sensorOn();
 void gpioSi7021sensorOff();
 void gpioSi7021_SCL_Disable();
 void gpioSi7021_SDA_Disable();
+void gpioSetDisplayExtcomin(bool);
 
 
 #endif /* SRC_GPIO_H_ */

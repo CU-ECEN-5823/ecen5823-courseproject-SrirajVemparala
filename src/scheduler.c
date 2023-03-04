@@ -149,7 +149,7 @@ void temperature_state_machine(sl_bt_msg_t *evt)
         {
          // LOG_INFO("Entering evtReadTemperature\n\r");
          // I2C_init();//I2C init
-          gpioSi7021sensorOn();//Enable sensor
+          //gpioSi7021sensorOn();//Enable sensor
           current_state = i2c_setup_time;
           // update comp1 value
           //LOG_INFO("i2c_tr\n\r");
@@ -162,7 +162,7 @@ void temperature_state_machine(sl_bt_msg_t *evt)
           current_state = i2c_write;
           I2C_init();//Initialize I2C
           i2c_write_cmd();//I2c write
-          //sl_power_manager_add_em_requirement(SL_POWER_MANAGER_EM1);//Add sl power management
+          sl_power_manager_add_em_requirement(SL_POWER_MANAGER_EM1);//Add sl power management
         }
       break;
     case i2c_write:
@@ -172,7 +172,7 @@ void temperature_state_machine(sl_bt_msg_t *evt)
           NVIC_DisableIRQ(I2C0_IRQn);
           //LOG_INFO("i2c_w\n\r");
           current_state = i2c_read_wait;
-          //sl_power_manager_remove_em_requirement(SL_POWER_MANAGER_EM1);
+          sl_power_manager_remove_em_requirement(SL_POWER_MANAGER_EM1);
           //comp1 update value
           timerwaitus_irq(TEMP_READ_WAIT_TIME);
         }
@@ -183,7 +183,7 @@ void temperature_state_machine(sl_bt_msg_t *evt)
           //LOG_INFO("i2c_rw\n\r");
           current_state = i2c_read;
           i2c_read_cmd(&read_data);
-          //sl_power_manager_add_em_requirement(SL_POWER_MANAGER_EM1);
+          sl_power_manager_add_em_requirement(SL_POWER_MANAGER_EM1);
         }
       break;
     case i2c_read:
@@ -200,7 +200,7 @@ void temperature_state_machine(sl_bt_msg_t *evt)
           temperature = (175.72 * temp_read)/ 65536- 46.85;
           //LOG_INFO("Temp =%dC\n\r",temperature);
           ble_send_temp(temperature);
-          gpioSi7021sensorOff();//Power Off
+          //gpioSi7021sensorOff();//Power Off
           i2c_deinitialize();
           current_state = i2c_idle;
        }
