@@ -17,6 +17,7 @@
 #include "src/timer.h"
 #define INCLUDE_LOG_DEBUG 1
 #include "src/log.h"
+#include "src/ble_device_type.h"
 // scheduler routine to set a scheduler event
 
 #define POWER_UP_TIME 80000 // 80 milli sec in microseconds
@@ -130,7 +131,7 @@ void schedulerSetEventi2cTransferDone()
 //
 //  return theEvent;
 //}
-
+#if DEVICE_IS_BLE_SERVER
 /*******************************************************
  *@Function void temperature_state_machine()
  *@Description State machine to communicate via i2c
@@ -209,3 +210,97 @@ void temperature_state_machine(sl_bt_msg_t *evt)
       break;
   }
 }
+#else
+/**************************************************************************//**
+ * @Function: discovery_state_machine()
+ * @Description: Handling Temperature
+ * @Param uint32_t
+ * @Return NULL
+ *****************************************************************************/
+void discovery_state_machine(sl_bt_msg_t *evt)
+{
+  sl_status_t sc=0;
+  static discovery_state current_state = PRIMARY_CHAR_UUID;
+  ble_data_struct_t *bleDataPtr = getBleDataPtr();
+  if(SL_BT_MSG_ID(evt->header) == sl_bt_evt_connection_closed_id)
+  {
+      current_state = PRIMARY_CHAR_UUID;
+  }
+  switch(current_state)
+  {
+    //Discover primary services by UUID
+    case PRIMARY_CHAR_UUID:
+      if(SL_BT_MSG_ID(evt->header) == sl_bt_evt_connection_opened_id)
+      {
+          sc = sl_bt_gatt_discover_primary_services_by_uuid(bleDataPtr->connection_handle,
+                                                            sizeof(thermo_service),
+                                                            (const uint8_t*)thermo_service);
+          if(sc != SL_STATUS_OK) {
+              LOG_ERROR("sl_bt_gatt_discover_primary_services_by_uuid() 1 returned != 0 status=0x%04x\n\r", (unsigned int)sc);
+
+          }
+          else
+          {
+          current_state = DISCOVER_CHAR_UUID;
+          }
+      }
+      break;
+      //Discover char by UUID
+    case DISCOVER_CHAR_UUID:
+      if(SL_BT_MSG_ID(evt->header) == sl_bt_evt_gatt_procedure_completed_id) {
+
+          sc = sl_bt_gatt_discover_characteristics_by_uuid(bleDataPtr->connection_handle,
+                                                           bleDataPtr->thermometer_service_handle,
+                                                           sizeof(thermo_char),
+                                                           (const uint8_t*)thermo_char);
+          if(sc != SL_STATUS_OK)
+          {
+              LOG_ERROR("sl_bt_gatt_discover_characteristics_by_uuid() 1 returned != 0 status=0x%04x\n\r", (unsigned int)sc);
+              current_state = PRIMARY_CHAR_UUID;
+          }
+          else
+          {
+              current_state =SET_CHAR_NOTIFY;
+          }
+      }
+      break;
+      //Get characteristic notification
+    case SET_CHAR_NOTIFY:
+      if(SL_BT_MSG_ID(evt->header) == sl_bt_evt_gatt_procedure_completed_id) {
+
+            sc = sl_bt_gatt_set_characteristic_notification(bleDataPtr->connection_handle,
+                                                          bleDataPtr->characteristic_handle,
+                                                          sl_bt_gatt_indication);
+            if(sc != SL_STATUS_OK)
+            {
+              LOG_ERROR("sl_bt_gatt_set_characteristic_notification() returned != 0 status=0x%04x\n\r", (unsigned int)sc);
+              current_state = PRIMARY_CHAR_UUID;
+            }
+            else
+            {
+            current_state = DISCOVERY_COMPLETE;
+            }
+       }
+      break;
+      //Discovery complete event
+    case DISCOVERY_COMPLETE:
+         if(SL_BT_MSG_ID(evt->header) == sl_bt_evt_gatt_procedure_completed_id)
+         {
+
+             current_state =CLOSE_CONNECTION;
+         }
+         else
+         {
+             current_state = PRIMARY_CHAR_UUID;
+         }
+         break;
+         //Closing the connection
+    case CLOSE_CONNECTION:
+      if(SL_BT_MSG_ID(evt->header) == sl_bt_evt_connection_closed_id)
+      {
+          current_state = PRIMARY_CHAR_UUID;
+      }
+      break;
+  }
+}
+#endif

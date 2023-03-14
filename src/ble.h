@@ -17,7 +17,7 @@
 #include "sl_status.h"
 #include "sl_bluetooth.h"
 #include <stdbool.h>
-
+#include "src/ble_device_type.h"
 
 #define UINT8_TO_BITSTREAM(p, n) { *(p)++ = (uint8_t)(n); }
 
@@ -31,9 +31,12 @@
 typedef struct {
   // values that are common to servers and clients
   bd_addr       myAddress;
+  bd_addr       server_addr;
   uint8_t       myAddressType;
   uint8_t       connection_handle;
   uint8_t       ble_connection_handle;
+  uint8_t       characteristic_handle;
+  uint8_t*      temp_value;
   // values unique for server
   // The advertising set handle allocated from Bluetooth stack.
   uint8_t       advertisingSetHandle;
@@ -41,10 +44,16 @@ typedef struct {
   bool          flag_connection_open_close;            // true when in an open connection
   bool          flag_ok_to_send_htm_indications; // true when client enabled indications
   bool          flag_in_flight;
+  bool          gatt_procedure_completed;
+  uint32_t      thermometer_service_handle;
   // values unique for client
 } ble_data_struct_t;
 
+
+
 ble_data_struct_t* getBleDataPtr(void);
 void handle_ble_event(sl_bt_msg_t *);
+#if DEVICE_IS_BLE_SERVER
 void ble_send_temp(uint32_t);
+#endif
 #endif /* SRC_BLE_H_ */

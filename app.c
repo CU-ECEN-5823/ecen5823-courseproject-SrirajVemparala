@@ -257,7 +257,9 @@ void sl_bt_on_event(sl_bt_msg_t *evt)
   // Some events require responses from our application code,
   // and don’t necessarily advance our state machines.
   // For A5 uncomment the next 2 function calls
+
    handle_ble_event(evt); // put this code in ble.c/.h
+#if DEVICE_IS_BLE_SERVER
   if(SL_BT_MSG_ID(evt->header) == sl_bt_evt_system_external_signal_id)
   {
     ble_data_struct_t *bleDataPtr = getBleDataPtr();
@@ -268,6 +270,8 @@ void sl_bt_on_event(sl_bt_msg_t *evt)
        temperature_state_machine(evt);    // put this code in scheduler.c/.h
    }
   }
-
+#else
+  discovery_state_machine(evt);      // put this code in src/scheduler.c/.h
+#endif
 } // sl_bt_on_event()
 
