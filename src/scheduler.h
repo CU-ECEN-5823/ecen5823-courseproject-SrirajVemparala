@@ -27,10 +27,10 @@ static const uint8_t thermo_char[2] = { 0x1c, 0x2a };
 
 void schedulerSetEventTemperaturemeasurement();
 uint32_t getNextEvent();
-#if DEVICE_IS_BLE_SERVER
-void temperature_state_machine(sl_bt_msg_t *);
 void schedulerSetEventcomp1set();
 void schedulerSetEventi2cTransferDone();
+#if DEVICE_IS_BLE_SERVER
+void temperature_state_machine(sl_bt_msg_t *);
 #else
 void discovery_state_machine(sl_bt_msg_t *);
 #endif
