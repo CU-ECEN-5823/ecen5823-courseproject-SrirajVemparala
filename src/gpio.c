@@ -35,6 +35,10 @@
 #define LED0_pin   4
 #define LED1_port  gpioPortF
 #define LED1_pin   5
+#define PB0_port  gpioPortF
+#define PB0_pin   6
+#define PB1_port  gpioPortF
+#define PB1_pin   7
 #define Si7021_EN_port gpioPortD
 #define Si7021_EN_pin  15
 #define Si7021_SCL_port gpioPortC
@@ -63,8 +67,9 @@ void gpioInit()
 	/*Setting the LED0 pin to push pull configuration*/
 	//GPIO_PinModeSet(LED1_port, LED1_pin, gpioModePushPull, false);
   GPIO_PinModeSet( Si7021_EN_port, Si7021_EN_pin, gpioModePushPull, true );
-
-
+  GPIO_PinModeSet( PB0_port, PB0_pin, gpioModeInput, true );
+  GPIO_PinModeSet( PB1_port, PB1_pin, gpioModeInput, true );
+  GPIO_ExtIntConfig(PB0_port, PB0_pin, PB0_pin, true, true, true);
 }
 
 /*Function Name: gpioLed0SetOn()

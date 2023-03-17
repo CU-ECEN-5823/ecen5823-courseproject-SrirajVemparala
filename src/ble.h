@@ -46,6 +46,9 @@ typedef struct {
   bool          flag_in_flight;
   bool          gatt_procedure_completed;
   uint32_t      thermometer_service_handle;
+  bool flag_ok_to_send_pb0_indications;
+  bool confirm_pass_key;
+  bool bonding_complete;
   // values unique for client
 } ble_data_struct_t;
 
@@ -55,5 +58,8 @@ ble_data_struct_t* getBleDataPtr(void);
 void handle_ble_event(sl_bt_msg_t *);
 #if DEVICE_IS_BLE_SERVER
 void ble_send_temp(uint32_t);
+void ble_send_pb0_indication(uint8_t);
+void enque_characteristics(uint16_t ,uint32_t ,uint8_t* );
+void dequeue_characteristics();
 #endif
 #endif /* SRC_BLE_H_ */

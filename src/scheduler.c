@@ -27,14 +27,6 @@ uint16_t read_data; // temperature data
 
 I2C_TransferReturn_TypeDef transferStatus; // Status of data transfer
 
-//Events present in the code
-typedef enum
-{
-  evtReadTemperature = 1,
-  evti2ccomp1setcomplete = 2,
-  evti2ctransfercomplete = 4
-}eventstriggered;
-
 //States of I2C machines
 enum I2C_states
 {
@@ -97,6 +89,34 @@ void schedulerSetEventi2cTransferDone()
    //myEvent |=evti2ctransfercomplete;
 //   LOG_INFO("Entering schedulerSetEventi2cTransferDone\n\r");
    LETIMER_IntDisable(LETIMER0, LETIMER_IEN_COMP1);
+   CORE_EXIT_CRITICAL();
+}
+
+/********************************************************************
+ *@Function void schedulerSetEventGPIOPB0()
+ *@Description Triggers when PB0 pin is set
+ *@Param NULL
+ *@Return NULL
+ ********************************************************************/
+void schedulerSetEventGPIOPB0set()
+{
+   CORE_DECLARE_IRQ_STATE;
+   CORE_ENTER_CRITICAL();
+   sl_bt_external_signal(evtgpiopb0intset);
+   CORE_EXIT_CRITICAL();
+}
+
+/********************************************************************
+ *@Function void schedulerSetEventGPIOPB0()
+ *@Description Triggers when PB0 pin is set
+ *@Param NULL
+ *@Return NULL
+ ********************************************************************/
+void schedulerSetEventGPIOPB0clear()
+{
+   CORE_DECLARE_IRQ_STATE;
+   CORE_ENTER_CRITICAL();
+   sl_bt_external_signal(evtgpiopb0intclear);
    CORE_EXIT_CRITICAL();
 }
 /*******************************************************

@@ -18,7 +18,14 @@ typedef enum
   DISCOVERY_COMPLETE,
   CLOSE_CONNECTION
 }discovery_state;
-
+typedef enum
+{
+  evtReadTemperature = 1,
+  evti2ccomp1setcomplete = 2,
+  evti2ctransfercomplete = 4,
+  evtgpiopb0intset = 8,
+  evtgpiopb0intclear = 16
+}eventstriggered;
 // Health Thermometer service UUID defined by Bluetooth SIG
 static const uint8_t thermo_service[2] = { 0x09, 0x18 };
 
@@ -31,6 +38,8 @@ void schedulerSetEventcomp1set();
 void schedulerSetEventi2cTransferDone();
 #if DEVICE_IS_BLE_SERVER
 void temperature_state_machine(sl_bt_msg_t *);
+void schedulerSetEventGPIOPB0set();
+void schedulerSetEventGPIOPB0clear();
 #else
 void discovery_state_machine(sl_bt_msg_t *);
 #endif

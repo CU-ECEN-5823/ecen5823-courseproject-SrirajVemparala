@@ -14,6 +14,7 @@
 #include "src/ble_device_type.h"
 #include "stdint.h"
 #include "math.h"
+#include "src/scheduler.h"
 /*******LOG MACRO AND HEADER*******/
 #define INCLUDE_LOG_DEBUG 1
 #include "src/log.h"
@@ -30,7 +31,12 @@
 #define LATENCY        4
 #define TIMEOUT                  800  //1000ms
 #define SCAN_PASSIVE                  0
-
+#define CONFIRM_BONDING 1
+#define SM_CONFIGURATION_FLAG 0x0F
+#define QUEUE_DEPTH      (16)
+#define TWOFIFTY_MILLISECOND 8192
+#define QUEUE_HANDLE 1
+#define CONTINUOUS_TIMER 0
 #else
 
 #define DIS_MAX_INTERVAL 60   //(250/0.625)
@@ -48,10 +54,22 @@
 
 ble_data_struct_t ble_data;
 sl_status_t sc;
-
+uint32_t         wptr = 0;              // write pointer
+uint32_t         rptr = 0;              // read pointer
+uint32_t length = 0; //Total elements in the array
 ble_data_struct_t* getBleDataPtr() {
   return (&ble_data);
 } // getBleDataPtr()
+static uint32_t nextPtr(uint32_t);
+typedef struct {
+
+  uint16_t  charHandle;
+  uint32_t bufferLength;
+  uint8_t buffer[5];
+
+} queue_struct_t;
+
+queue_struct_t characteristics[QUEUE_DEPTH];
 
 /****************************************/
 // -----------------------------------------------
@@ -88,6 +106,70 @@ static int32_t FLOAT_TO_INT32(const uint8_t *value_start_little_endian)
   return (int32_t) (pow(10, exponent) * mantissa);
 } // FLOAT_TO_INT32
 #endif
+
+static uint32_t nextPtr(uint32_t ptr)
+{
+
+  if (ptr+1 >= QUEUE_DEPTH)
+    return 0;     // wrap back to 0
+  else
+    return ptr+1; // advance
+
+
+
+} // nextPtr()
+void enque_characteristics(uint16_t charHandles,uint32_t bufferLength,uint8_t* buffer)
+{
+  if(length <QUEUE_DEPTH)
+  {
+
+    //Store the data into queue
+      characteristics[wptr].charHandle = charHandles;
+      characteristics[wptr].bufferLength = bufferLength;
+      for(uint32_t i =0;i<bufferLength;i++)
+      {
+         characteristics[wptr].buffer[i] = buffer[i];
+      }
+
+     wptr = nextPtr(wptr);
+     length++;
+     LOG_INFO("length =%dC\n\r",length);
+  }
+}
+void dequeue_characteristics()
+{
+  ble_data_struct_t *bleDataPtr = getBleDataPtr();
+  uint16_t  charHandles;
+  uint32_t bufferLength;
+  uint8_t buffer[5];
+
+  if((length > 1) && (bleDataPtr->flag_in_flight == false))
+    {
+      charHandles = characteristics[rptr].charHandle;
+      bufferLength = characteristics[rptr].bufferLength;
+      for(uint32_t i =0;i<bufferLength;i++)
+        {
+          buffer[i] = characteristics[rptr].buffer[i];
+        }
+      rptr = nextPtr(rptr);
+      length--;
+      //sc=sl_bt_gatt_server_write_attribute_value(charHandles,0,bufferLength,buffer);
+      sc = sl_bt_gatt_server_send_indication(bleDataPtr->ble_connection_handle,charHandles,bufferLength,buffer);
+      if (sc != SL_STATUS_OK)
+        {
+          LOG_ERROR("sl_bt_gatt_server_send_indication() returned != 0 status=0x%04x", (unsigned int) sc);
+        }
+      else
+        {
+          bleDataPtr->flag_in_flight = true;
+        }
+      LOG_INFO("length =%dC\n\r",length);
+    }
+  else
+    {
+
+    }
+}
 /**************************************************************************//**
  * @Function: handle_ble_event()
  * @Description: Handling Bluetooth events.
@@ -101,8 +183,9 @@ void handle_ble_event(sl_bt_msg_t *evt)
   switch (SL_BT_MSG_ID(evt->header))                       //Check for BLE Event
   {
     case sl_bt_evt_system_boot_id:                         //System Boot Started
-
       displayInit();
+      bleDataPtr->bonding_complete = false;
+      bleDataPtr->confirm_pass_key = false;
 #if DEVICE_IS_BLE_SERVER
       displayPrintf(DISPLAY_ROW_NAME, "Server");
 #else
@@ -141,6 +224,7 @@ void handle_ble_event(sl_bt_msg_t *evt)
         {
           LOG_ERROR("sl_bt_advertiser_start() returned != 0 status=0x%04x", (unsigned int) sc);
         }
+      sl_bt_sm_configure(SM_CONFIGURATION_FLAG, sm_io_capability_displayyesno);
       displayPrintf(DISPLAY_ROW_CONNECTION, "Advertising");
 
 #else             //Client Mode
@@ -176,6 +260,16 @@ void handle_ble_event(sl_bt_msg_t *evt)
 #if DEVICE_IS_BLE_SERVER    //Server Mode
       bleDataPtr->ble_connection_handle=evt->data.evt_connection_opened.connection;
       sl_bt_advertiser_stop(bleDataPtr->advertisingSetHandle);
+      sc= sl_bt_sm_delete_bondings();
+      if (sc != SL_STATUS_OK)
+      {
+               LOG_ERROR("sl_bt_sm_delete_bondings() returned != 0 status=0x%04x", (unsigned int) sc);
+               break;
+      }
+      else
+        {
+          bleDataPtr->bonding_complete = false;
+        }
       if (sc != SL_STATUS_OK)
         {
           LOG_ERROR("sl_bt_advertiser_stop() returned != 0 status=0x%04x", (unsigned int) sc);
@@ -193,6 +287,12 @@ void handle_ble_event(sl_bt_msg_t *evt)
 
           displayPrintf(DISPLAY_ROW_CONNECTION, "Connected" );
         }
+      sl_status_t   timer_response;
+      timer_response = sl_bt_system_set_soft_timer(TWOFIFTY_MILLISECOND,QUEUE_HANDLE,CONTINUOUS_TIMER);
+      if (timer_response != SL_STATUS_OK)
+      {
+         LOG_ERROR("Error in timer response");
+      }
 #else
       bleDataPtr->flag_connection_open_close = true;
 
@@ -204,9 +304,42 @@ void handle_ble_event(sl_bt_msg_t *evt)
 #endif
       displayPrintf(DISPLAY_ROW_CONNECTION, "Connected");
       break;
+    case sl_bt_evt_sm_confirm_bonding_id:
+      if(evt->data.evt_sm_confirm_bonding.bonding_handle == SL_BT_INVALID_BONDING_HANDLE)
+      {
+          sc = sl_bt_sm_bonding_confirm(bleDataPtr->ble_connection_handle,CONFIRM_BONDING);
+          if (sc != SL_STATUS_OK)
+          {
+                   LOG_ERROR("sl_bt_sm_bonding_confirm() returned != 0 status=0x%04x", (unsigned int) sc);
+                   break;
+          }
+      }
+      break;
+    case sl_bt_evt_sm_confirm_passkey_id:
+      {
+      uint32_t passkey = evt->data.evt_sm_confirm_passkey.passkey;
+      bleDataPtr->confirm_pass_key = true;
+      displayPrintf(DISPLAY_ROW_PASSKEY,"pass_key=%d",passkey);
+      displayPrintf(DISPLAY_ROW_ACTION,"Confirm with PB0");
+      //sl_bt_sm_passkey_confirm(bleDataPtr->ble_connection_handle,0x01);
+      }
+      break;
+    case sl_bt_evt_sm_bonded_id:
+      bleDataPtr->bonding_complete = true;
+      displayPrintf(DISPLAY_ROW_CONNECTION, "Bonded" );
+      displayPrintf(DISPLAY_ROW_PASSKEY,"");
+      displayPrintf(DISPLAY_ROW_ACTION,"");
+      break;
+    case sl_bt_evt_sm_bonding_failed_id:
+      bleDataPtr->bonding_complete = false;
+      LOG_ERROR("Bonding Failed");
+      break;
     case sl_bt_evt_connection_closed_id:                   //Event Connection is closed
       bleDataPtr->flag_ok_to_send_htm_indications = false;
+      bleDataPtr->flag_ok_to_send_pb0_indications = false;
       bleDataPtr->flag_connection_open_close = false;
+      bleDataPtr->bonding_complete = false;
+      bleDataPtr->confirm_pass_key = false;
       bleDataPtr->flag_in_flight = false;
 #if DEVICE_IS_BLE_SERVER        //Server Mode
       //Advertisement Start
@@ -220,6 +353,12 @@ void handle_ble_event(sl_bt_msg_t *evt)
         {
           displayPrintf(DISPLAY_ROW_CONNECTION, "Advertising" );
         }
+      sc= sl_bt_sm_delete_bondings();
+      if (sc != SL_STATUS_OK)
+      {
+               LOG_ERROR("sl_bt_sm_delete_bondings() returned != 0 status=0x%04x", (unsigned int) sc);
+               break;
+      }
       // handle close events
       displayPrintf(DISPLAY_ROW_TEMPVALUE,"");
 #else         //Client Mode
@@ -242,16 +381,27 @@ void handle_ble_event(sl_bt_msg_t *evt)
     case sl_bt_evt_system_soft_timer_id:
       //Indicates that a soft timer has lapsed.
       if(evt->data.evt_system_soft_timer.handle==0)
-        {
+      {
           displayUpdate();
-        }
+      }
+      if(evt->data.evt_system_soft_timer.handle==1)
+      {
+          dequeue_characteristics();
+      }
       break;
 
 #if DEVICE_IS_BLE_SERVER
     case sl_bt_evt_gatt_server_characteristic_status_id://Verify if data is updated in GATT server and ack received from Client
       if(evt->data.evt_gatt_server_characteristic_status.client_config_flags == sl_bt_gatt_server_disable)
         {
-          bleDataPtr->flag_ok_to_send_htm_indications = false;
+          if(evt->data.evt_gatt_server_characteristic_status.characteristic == gattdb_temperature_measurement)
+          {
+              bleDataPtr->flag_ok_to_send_htm_indications = false;
+          }
+          if(evt->data.evt_gatt_server_characteristic_status.characteristic == gattdb_button_state)
+          {
+              bleDataPtr->flag_ok_to_send_pb0_indications = false;
+          }
           displayPrintf(DISPLAY_ROW_TEMPVALUE,"");
         }
       else if(evt->data.evt_gatt_server_characteristic_status.client_config_flags == sl_bt_gatt_server_indication)
@@ -259,6 +409,10 @@ void handle_ble_event(sl_bt_msg_t *evt)
           if(evt->data.evt_gatt_server_characteristic_status.characteristic == gattdb_temperature_measurement)
             {
               bleDataPtr->flag_ok_to_send_htm_indications = true;
+            }
+          if(evt->data.evt_gatt_server_characteristic_status.characteristic == gattdb_button_state)
+            {
+              bleDataPtr->flag_ok_to_send_pb0_indications = true;
             }
         }
       else
@@ -276,7 +430,36 @@ void handle_ble_event(sl_bt_msg_t *evt)
           LOG_ERROR("Error in indication\n\r");
         }
       bleDataPtr->flag_ok_to_send_htm_indications = false;
+      bleDataPtr->flag_ok_to_send_pb0_indications = false;
       bleDataPtr->flag_in_flight=false;
+      bleDataPtr->bonding_complete = false;
+      bleDataPtr->confirm_pass_key = false;
+      break;
+    case sl_bt_evt_system_external_signal_id:
+      if(evt->data.evt_system_external_signal.extsignals == evtgpiopb0intset)
+      {
+          if(bleDataPtr->bonding_complete == true)
+            {
+              ble_send_pb0_indication(0x01);
+              displayPrintf(DISPLAY_ROW_9, "Button Released");
+            }
+      }
+      else if(evt->data.evt_system_external_signal.extsignals == evtgpiopb0intclear)
+      {
+          if(bleDataPtr->confirm_pass_key == true)
+          {
+              sl_bt_sm_passkey_confirm(bleDataPtr->ble_connection_handle,0x01);
+          }
+          if(bleDataPtr->bonding_complete == true)
+          {
+              ble_send_pb0_indication(0x00);
+              displayPrintf(DISPLAY_ROW_9, "Button Pressed");
+          }
+      }
+      else
+      {
+
+      }
       break;
 #else
     case sl_bt_evt_scanner_scan_report_id://Connection established
@@ -347,6 +530,46 @@ void handle_ble_event(sl_bt_msg_t *evt)
 }
 #if DEVICE_IS_BLE_SERVER
 /**************************************************************************//**
+ * @Function: ble_send_pb0_indication()
+ * @Description: Handling Temperature
+ * @Param uint32_t
+ * @Return NULL
+ *****************************************************************************/
+void ble_send_pb0_indication(uint8_t pb0_state)
+{
+  //uint8_t pb0_state_buffer[3];
+  uint16_t  charHandles = gattdb_button_state;
+  uint32_t bufferLength = 2;
+  uint8_t buffer[2];
+      buffer[0] = 0x00;
+      buffer[1] = pb0_state;
+  ble_data_struct_t *bleDataPtr = getBleDataPtr();
+ // const uint8_t* value = (uint8_t *)&pb0_state;
+  sc=sl_bt_gatt_server_write_attribute_value(gattdb_button_state,0,bufferLength,buffer);
+  //displayPrintf(DISPLAY_ROW_TEMPVALUE, "temp=%d", temperature_in_c);
+  if(bleDataPtr->flag_connection_open_close == true  && bleDataPtr->flag_ok_to_send_pb0_indications == true)
+    {
+      if(bleDataPtr->flag_in_flight == false)
+        {
+          sc = sl_bt_gatt_server_send_indication(bleDataPtr->ble_connection_handle,gattdb_button_state,2,buffer);
+          if (sc != SL_STATUS_OK)
+            {
+              LOG_ERROR("sl_bt_gatt_server_send_indication() returned != 0 status=0x%04x", (unsigned int) sc);
+            }
+          else
+            {
+              bleDataPtr->flag_in_flight = true;
+            }
+          LOG_INFO("pb0_state=%d\n\r", pb0_state);//print pb0_state
+        }
+      else
+        {
+          enque_characteristics(charHandles,bufferLength,buffer);
+        }
+    }
+}
+
+/**************************************************************************//**
  * @Function: ble_send_temp()
  * @Description: Handling Temperature
  * @Param uint32_t
@@ -357,12 +580,13 @@ void ble_send_temp(uint32_t temperature_in_c)
   uint8_t htm_temperature_buffer[5];
   uint8_t *p = htm_temperature_buffer;
   uint32_t htm_temperature_flt;
+  uint32_t bufferLength = 5;
   UINT8_TO_BITSTREAM(p,0); //set n to 0
   htm_temperature_flt = UINT32_TO_FLOAT(temperature_in_c*1000, -3);
   // Convert temperature to bit stream and place it in the htm_temperature_buffer
   UINT32_TO_BITSTREAM(p, htm_temperature_flt);
   ble_data_struct_t *bleDataPtr = getBleDataPtr();
-  sc=sl_bt_gatt_server_write_attribute_value(gattdb_temperature_measurement,0,5,htm_temperature_buffer);
+  sc=sl_bt_gatt_server_write_attribute_value(gattdb_temperature_measurement,0,bufferLength,htm_temperature_buffer);
   displayPrintf(DISPLAY_ROW_TEMPVALUE, "temp=%d", temperature_in_c);
   if(bleDataPtr->flag_connection_open_close == true  && bleDataPtr->flag_ok_to_send_htm_indications == true)
     {
@@ -379,6 +603,11 @@ void ble_send_temp(uint32_t temperature_in_c)
             }
           LOG_INFO("temp=%d\n\r", temperature_in_c);//print temperature
         }
+      else
+        {
+          enque_characteristics(gattdb_temperature_measurement,bufferLength,htm_temperature_buffer);
+        }
     }
+ // LOG_INFO("Indi =%dC\n\r",bleDataPtr->flag_ok_to_send_htm_indications);
 }
 #endif

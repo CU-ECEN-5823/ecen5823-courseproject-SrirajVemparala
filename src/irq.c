@@ -14,6 +14,7 @@
 #include "src/scheduler.h"
 #define INCLUDE_LOG_DEBUG 1
 #include "src/log.h"
+#include "src/gpio.h"
 
 //bool uf_int = true;//Check if underflow and COMP1 flag is set to control the LED ON and OFF
 uint32_t log_timer = 0;
@@ -40,6 +41,25 @@ void LETIMER0_IRQHandler(void)
  {
      schedulerSetEventcomp1set();
  }
+}
+/*************
+ * @Function void GPIO_EVEN_IRQHandler()
+ * @Description Used as GPIO EVEN Interrupt Handler
+ * @Param NULL
+ * @Return NULL
+ *************/
+/**< GPIO_EVEN IRQ Handler */
+void GPIO_EVEN_IRQHandler(void)
+{
+  GPIO_IntClear(0xFFFFFFFF);
+  if(GPIO_PinInGet(PB0_port,PB0_pin)==1)
+  {
+      schedulerSetEventGPIOPB0set();
+  }
+  if(GPIO_PinInGet(PB0_port,PB0_pin)==0)
+  {
+      schedulerSetEventGPIOPB0clear();
+  }
 }
 
 /*************
