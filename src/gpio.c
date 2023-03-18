@@ -63,9 +63,9 @@ void gpioInit()
 	GPIO_PinModeSet(LED0_port, LED0_pin, gpioModePushPull, false);
 
 	//GPIO_DriveStrengthSet(LED1_port, gpioDriveStrengthStrongAlternateStrong);
-	//GPIO_DriveStrengthSet(LED1_port, gpioDriveStrengthWeakAlternateWeak);
+	GPIO_DriveStrengthSet(LED1_port, gpioDriveStrengthWeakAlternateWeak);
 	/*Setting the LED0 pin to push pull configuration*/
-	//GPIO_PinModeSet(LED1_port, LED1_pin, gpioModePushPull, false);
+	GPIO_PinModeSet(LED1_port, LED1_pin, gpioModePushPull, false);
   GPIO_PinModeSet( Si7021_EN_port, Si7021_EN_pin, gpioModePushPull, true );
   GPIO_PinModeSet( PB0_port, PB0_pin, gpioModeInput, true );
   GPIO_PinModeSet( PB1_port, PB1_pin, gpioModeInput, true );
