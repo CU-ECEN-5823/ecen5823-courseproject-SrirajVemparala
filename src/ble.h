@@ -37,6 +37,7 @@ typedef struct {
   uint8_t       ble_connection_handle;
   uint8_t       characteristic_handle;
   uint8_t*      temp_value;
+  uint8_t      button_value;
   // values unique for server
   // The advertising set handle allocated from Bluetooth stack.
   uint8_t       advertisingSetHandle;
@@ -45,7 +46,7 @@ typedef struct {
   bool          flag_ok_to_send_htm_indications; // true when client enabled indications
   bool          flag_in_flight;
   bool          gatt_procedure_completed;
-  uint32_t      thermometer_service_handle;
+  uint32_t      service_handle;
   bool flag_ok_to_send_pb0_indications;
   bool confirm_pass_key;
   bool bonding_complete;

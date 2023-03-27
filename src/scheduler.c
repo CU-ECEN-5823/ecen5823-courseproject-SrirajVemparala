@@ -15,6 +15,7 @@
 #include "gpio.h"
 #include "src/ble.h"
 #include "src/timer.h"
+#include "gatt_db.h"
 #define INCLUDE_LOG_DEBUG 1
 #include "src/log.h"
 #include "src/ble_device_type.h"
@@ -102,6 +103,7 @@ void schedulerSetEventGPIOPB0set()
 {
    CORE_DECLARE_IRQ_STATE;
    CORE_ENTER_CRITICAL();
+   //gpioLed0SetOn();
    sl_bt_external_signal(evtgpiopb0intset);
    CORE_EXIT_CRITICAL();
 }
@@ -116,7 +118,36 @@ void schedulerSetEventGPIOPB0clear()
 {
    CORE_DECLARE_IRQ_STATE;
    CORE_ENTER_CRITICAL();
+   //gpioLed0SetOff();
    sl_bt_external_signal(evtgpiopb0intclear);
+   CORE_EXIT_CRITICAL();
+}
+
+/********************************************************************
+ *@Function void schedulerSetEventGPIOPB0()
+ *@Description Triggers when PB0 pin is set
+ *@Param NULL
+ *@Return NULL
+ ********************************************************************/
+void schedulerSetEventGPIOPB1set()
+{
+   CORE_DECLARE_IRQ_STATE;
+   CORE_ENTER_CRITICAL();
+   sl_bt_external_signal(evtgpiopb1intset);
+   CORE_EXIT_CRITICAL();
+}
+
+/********************************************************************
+ *@Function void schedulerSetEventGPIOPB0()
+ *@Description Triggers when PB0 pin is set
+ *@Param NULL
+ *@Return NULL
+ ********************************************************************/
+void schedulerSetEventGPIOPB1clear()
+{
+   CORE_DECLARE_IRQ_STATE;
+   CORE_ENTER_CRITICAL();
+   sl_bt_external_signal(evtgpiopb1intclear);
    CORE_EXIT_CRITICAL();
 }
 /*******************************************************
@@ -270,13 +301,12 @@ void discovery_state_machine(sl_bt_msg_t *evt)
       if(SL_BT_MSG_ID(evt->header) == sl_bt_evt_gatt_procedure_completed_id) {
 
           sc = sl_bt_gatt_discover_characteristics_by_uuid(bleDataPtr->connection_handle,
-                                                           bleDataPtr->thermometer_service_handle,
+                                                           bleDataPtr->service_handle,
                                                            sizeof(thermo_char),
                                                            (const uint8_t*)thermo_char);
           if(sc != SL_STATUS_OK)
           {
               LOG_ERROR("sl_bt_gatt_discover_characteristics_by_uuid() 1 returned != 0 status=0x%04x\n\r", (unsigned int)sc);
-              current_state = PRIMARY_CHAR_UUID;
           }
           else
           {
@@ -289,19 +319,65 @@ void discovery_state_machine(sl_bt_msg_t *evt)
       if(SL_BT_MSG_ID(evt->header) == sl_bt_evt_gatt_procedure_completed_id) {
 
             sc = sl_bt_gatt_set_characteristic_notification(bleDataPtr->connection_handle,
-                                                          bleDataPtr->characteristic_handle,
+                                                            gattdb_temperature_measurement,
                                                           sl_bt_gatt_indication);
             if(sc != SL_STATUS_OK)
             {
               LOG_ERROR("sl_bt_gatt_set_characteristic_notification() returned != 0 status=0x%04x\n\r", (unsigned int)sc);
-              current_state = PRIMARY_CHAR_UUID;
             }
             else
             {
-            current_state = DISCOVERY_COMPLETE;
+                current_state = PRIMARY_BUTTON_CHAR_UUID;
             }
        }
       break;
+    case PRIMARY_BUTTON_CHAR_UUID:
+      if(SL_BT_MSG_ID(evt->header) == sl_bt_evt_gatt_procedure_completed_id) {
+      sc = sl_bt_gatt_discover_primary_services_by_uuid(bleDataPtr->connection_handle,
+                                                                 sizeof(push_button_service),
+                                                                 (const uint8_t*)push_button_service);
+      if(sc != SL_STATUS_OK) {
+                   LOG_ERROR("sl_bt_gatt_discover_primary_services_by_uuid() 1 returned != 0 status=0x%04x\n\r", (unsigned int)sc);
+               }
+      else
+        {
+          current_state =  DISCOVER_BUTTON_CHAR_UUID;
+        }
+      }
+      break;
+    case DISCOVER_BUTTON_CHAR_UUID:
+      if(SL_BT_MSG_ID(evt->header) == sl_bt_evt_gatt_procedure_completed_id) {
+
+          sc = sl_bt_gatt_discover_characteristics_by_uuid(bleDataPtr->connection_handle,
+                                                           bleDataPtr->service_handle,
+                                                           sizeof(push_button_char),
+                                                           (const uint8_t*)push_button_char);
+          if(sc != SL_STATUS_OK)
+          {
+              LOG_ERROR("sl_bt_gatt_discover_characteristics_by_uuid() 1 returned != 0 status=0x%04x\n\r", (unsigned int)sc);
+          }
+          else
+          {
+              current_state =SET_CHAR_BUTTON_NOTIFY;
+          }
+      }
+      break;
+    case SET_CHAR_BUTTON_NOTIFY:
+      if(SL_BT_MSG_ID(evt->header) == sl_bt_evt_gatt_procedure_completed_id) {
+
+                  sc = sl_bt_gatt_set_characteristic_notification(bleDataPtr->connection_handle,
+                                                                  gattdb_button_state,
+                                                                sl_bt_gatt_indication);
+                  if(sc != SL_STATUS_OK)
+                  {
+                    LOG_ERROR("sl_bt_gatt_set_characteristic_notification() returned != 0 status=0x%04x\n\r", (unsigned int)sc);
+                  }
+                  else
+                  {
+                  current_state = DISCOVERY_COMPLETE;
+                  }
+             }
+            break;
       //Discovery complete event
     case DISCOVERY_COMPLETE:
          if(SL_BT_MSG_ID(evt->header) == sl_bt_evt_gatt_procedure_completed_id)

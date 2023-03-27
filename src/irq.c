@@ -63,6 +63,25 @@ void GPIO_EVEN_IRQHandler(void)
 }
 
 /*************
+ * @Function void GPIO_EVEN_IRQHandler()
+ * @Description Used as GPIO EVEN Interrupt Handler
+ * @Param NULL
+ * @Return NULL
+ *************/
+/**< GPIO_ODD IRQ Handler */
+void GPIO_ODD_IRQHandler(void)
+{
+  GPIO_IntClear(0xFFFFFFFF);
+  if(GPIO_PinInGet(PB1_port,PB1_pin)==1)
+  {
+      schedulerSetEventGPIOPB1set();
+  }
+  if(GPIO_PinInGet(PB1_port,PB1_pin)==0)
+  {
+      schedulerSetEventGPIOPB1clear();
+  }
+}
+/*************
  * @Function void I2C0_IRQHandler()
  * @Description Used as LETIMER0 Interrupt Handler
  * @Param NULL
