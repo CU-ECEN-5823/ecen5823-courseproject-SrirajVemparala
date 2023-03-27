@@ -336,7 +336,7 @@ void handle_ble_event(sl_bt_msg_t *evt)
       displayPrintf(DISPLAY_ROW_PASSKEY,"");
       displayPrintf(DISPLAY_ROW_ACTION,"");
       #if !(DEVICE_IS_BLE_SERVER)
-      displayPrintf(DISPLAY_ROW_9,"");
+      displayPrintf(DISPLAY_ROW_9,"Button Released");
       #endif
       break;
 #if DEVICE_IS_BLE_SERVER
