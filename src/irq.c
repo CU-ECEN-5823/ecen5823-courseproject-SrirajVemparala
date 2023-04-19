@@ -31,16 +31,16 @@ void LETIMER0_IRQHandler(void)
   LETIMER_IntClear(LETIMER0,flag_value);
   //Check if COMP1 interrupt is set
   //Check if UF interrupt is set
- if((flag_value&LETIMER_IF_UF))
-  {
-     log_timer++;
-     //Schedule the Event Temperature measurement
-     schedulerSetEventTemperaturemeasurement();
-  }
- if((flag_value&LETIMER_IF_COMP1))
- {
-     schedulerSetEventcomp1set();
- }
+  if((flag_value&LETIMER_IF_UF))
+    {
+      log_timer++;
+      //Schedule the Event Temperature measurement
+      schedulerSetEventTemperaturemeasurement();
+    }
+  if((flag_value&LETIMER_IF_COMP1))
+    {
+      schedulerSetEventcomp1set();
+    }
 }
 /*************
  * @Function void GPIO_EVEN_IRQHandler()
@@ -52,20 +52,44 @@ void LETIMER0_IRQHandler(void)
 void GPIO_EVEN_IRQHandler(void)
 {
   GPIO_IntClear(0xFFFFFFFF);
-  if(GPIO_PinInGet(PB0_port,PB0_pin)==1)
-  {
+ /* if(GPIO_PinInGet(PB0_port,PB0_pin)==1)
+    {
       schedulerSetEventGPIOPB0set();
-  }
+    }
   if(GPIO_PinInGet(PB0_port,PB0_pin)==0)
-  {
+    {
       schedulerSetEventGPIOPB0clear();
-  }
-  if(GPIO_PinInGet(PIR_SENSOR_PORT,PIR_SENSOR_PIN)==1)
+    }*/
+  /*if(GPIO_PinInGet(PIR_SENSOR_PORT,PIR_SENSOR_PIN)==1)
+    {
+      schedulerSetEventPIRtriggeredset();
+    }*/
+   if (GPIO_PinInGet(PIR_SENSOR_PORT, PIR_SENSOR_PIN))
    {
-       schedulerSetEventPIRtriggeredset();
+    LOG_INFO("Motion detected!\n\r");
+    gpioLed0SetOn();
    }
+   else
+   {
+       LOG_INFO("Motion not detected!\n\r");
+       gpioLed0SetOff();
+   }
+ /* while (1)
+  {
+    uint32_t pirInput = GPIO_PinInGet(PIR_SENSOR_PORT, PIR_SENSOR_PIN);
+    // Check the PIR sensor input and set a flag if motion is detected
+    if (pirInput == 1)
+    {
+        LOG_INFO("Motion detected!\n");
+        gpioLed0SetOn();
+    }
+    else
+        {
+        LOG_INFO("Motion not detected!\n");
+               gpioLed0SetOff();
+        }
+}*/
 }
-
 /*************
  * @Function void GPIO_EVEN_IRQHandler()
  * @Description Used as GPIO EVEN Interrupt Handler
@@ -85,6 +109,7 @@ void GPIO_ODD_IRQHandler(void)
       schedulerSetEventGPIOPB1clear();
   }
 }
+
 /*************
  * @Function void I2C0_IRQHandler()
  * @Description Used as LETIMER0 Interrupt Handler
@@ -96,15 +121,15 @@ void I2C0_IRQHandler(void) {
   I2C_TransferReturn_TypeDef  transferStatus;
   transferStatus = I2C_Transfer(I2C0);
   if (transferStatus == i2cTransferDone)
-  {
+    {
       //LOG_INFO("i2cd\n\r");
       schedulerSetEventi2cTransferDone();
       //NVIC_DisableIRQ(I2C0_IRQn);//Should not be used in IRQ
-  }
+    }
   if (transferStatus < 0)
-  {
+    {
       LOG_ERROR("%d\n\r", transferStatus);
-  }
+    }
 }
 
 int letimerMilliseconds()

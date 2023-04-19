@@ -24,6 +24,8 @@
 #define POWER_UP_TIME 80000 // 80 milli sec in microseconds
 #define TEMP_READ_WAIT_TIME 10800 // 10.8 milli sec microseconds
 
+#define INCLUDE_LOG_DEBUG 1
+#include "log.h"
 
 uint16_t read_data; // temperature data
 
@@ -146,6 +148,8 @@ void schedulerSetEventGPIOPB1set()
 void schedulerSetEventPIRtriggeredset()
 {
   //Write code here
+  LOG_INFO("Motion detected!\n");
+    gpioLed0SetOn();
 }
 /********************************************************************
  *@Function void schedulerSetEventGPIOPB0()
