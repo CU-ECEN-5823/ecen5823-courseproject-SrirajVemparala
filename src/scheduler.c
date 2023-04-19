@@ -24,6 +24,7 @@
 #define POWER_UP_TIME 80000 // 80 milli sec in microseconds
 #define TEMP_READ_WAIT_TIME 10800 // 10.8 milli sec microseconds
 
+
 uint16_t read_data; // temperature data
 
 I2C_TransferReturn_TypeDef transferStatus; // Status of data transfer
@@ -136,7 +137,16 @@ void schedulerSetEventGPIOPB1set()
    sl_bt_external_signal(evtgpiopb1intset);
    CORE_EXIT_CRITICAL();
 }
-
+/********************************************************************
+ *@Function void schedulerSetEventPIRtriggeredset()
+ *@Description Triggers when PIR sensor triggered
+ *@Param NULL
+ *@Return NULL
+ ********************************************************************/
+void schedulerSetEventPIRtriggeredset()
+{
+  //Write code here
+}
 /********************************************************************
  *@Function void schedulerSetEventGPIOPB0()
  *@Description Triggers when PB0 pin is set

@@ -166,7 +166,7 @@ SL_WEAK void app_init(void)
   // Put your application 1-time initialization code here.
   // This is called once during start-up.
   // Don't call any Bluetooth API functions until after the boot event.
-  sl_power_manager_add_em_requirement(LOWEST_ENERGY_MODE);
+  //sl_power_manager_add_em_requirement(LOWEST_ENERGY_MODE);
   gpioInit();
   cmu_init();
   init_LETIMER0();
@@ -174,8 +174,8 @@ SL_WEAK void app_init(void)
   NVIC_EnableIRQ(GPIO_EVEN_IRQn);
   NVIC_ClearPendingIRQ(GPIO_ODD_IRQn);
   NVIC_EnableIRQ(GPIO_ODD_IRQn);
-  NVIC_ClearPendingIRQ(LETIMER0_IRQn);
-  NVIC_EnableIRQ(LETIMER0_IRQn);
+  //NVIC_ClearPendingIRQ(LETIMER0_IRQn);
+  //NVIC_EnableIRQ(LETIMER0_IRQn);
 
 } // app_init()
 
@@ -219,11 +219,11 @@ SL_WEAK void app_process_action(void)
  // LOG_INFO("Entering Inappprocessaction\n\r");
    //evt = getNextEvent();
    //temperature_state_machine(evt);
-//   switch (evt) {
-//   case evtLETimer_UF:
-//       read_temp_from_si7021();
-//   break;
-//   }
+  // switch (evt) {
+  //case evtLETimer_UF:
+       read_lux_from_veml6030();
+ //  break;
+  // }
 //  if(uf_int)
 //  {
 //      /*Turn ON LED's 0*/
@@ -262,20 +262,20 @@ void sl_bt_on_event(sl_bt_msg_t *evt)
   // and don’t necessarily advance our state machines.
   // For A5 uncomment the next 2 function calls
 
-   handle_ble_event(evt); // put this code in ble.c/.h
-#if DEVICE_IS_BLE_SERVER
-  if(SL_BT_MSG_ID(evt->header) == sl_bt_evt_system_external_signal_id)
-  {
-    ble_data_struct_t *bleDataPtr = getBleDataPtr();
-
-  // sequence through states driven by events
-   if(bleDataPtr->flag_ok_to_send_htm_indications == true)
-   {
-       temperature_state_machine(evt);    // put this code in scheduler.c/.h
-   }
-  }
-#else
-  discovery_state_machine(evt);      // put this code in src/scheduler.c/.h
-#endif
+//   handle_ble_event(evt); // put this code in ble.c/.h
+//#if DEVICE_IS_BLE_SERVER
+//  if(SL_BT_MSG_ID(evt->header) == sl_bt_evt_system_external_signal_id)
+//  {
+//    ble_data_struct_t *bleDataPtr = getBleDataPtr();
+//
+//  // sequence through states driven by events
+//   if(bleDataPtr->flag_ok_to_send_htm_indications == true)
+//   {
+//       temperature_state_machine(evt);    // put this code in scheduler.c/.h
+//   }
+//  }
+//#else
+//  discovery_state_machine(evt);      // put this code in src/scheduler.c/.h
+//#endif
 } // sl_bt_on_event()
 

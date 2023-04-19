@@ -60,6 +60,10 @@ void GPIO_EVEN_IRQHandler(void)
   {
       schedulerSetEventGPIOPB0clear();
   }
+  if(GPIO_PinInGet(PIR_SENSOR_PORT,PIR_SENSOR_PIN)==1)
+   {
+       schedulerSetEventPIRtriggeredset();
+   }
 }
 
 /*************

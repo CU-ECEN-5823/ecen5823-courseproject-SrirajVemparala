@@ -14,7 +14,7 @@
 #define INCLUDE_LOG_DEBUG 1
 #include "log.h"
 
-
+#define INTEGRATION_TIME 100000 // 100 milli sec in microseconds
 
 uint8_t cmd_data; // temperature request command data
 I2C_TransferSeq_TypeDef transferSequence; // Data transfer Sequence
@@ -67,9 +67,9 @@ transferSequence.addr = SI7021_DEVICE_ADDR << 1; // shift device address left
 transferSequence.flags = I2C_FLAG_WRITE;
 transferSequence.buf[0].data = &cmd_data; // pointer to data to write
 transferSequence.buf[0].len = sizeof(cmd_data);
-NVIC_EnableIRQ(I2C0_IRQn);
+//NVIC_EnableIRQ(I2C0_IRQn);
 //LOG_INFO("i2c_wri_cmd\n\r");
-transferStatus = I2C_TransferInit(I2C0,&transferSequence);
+transferStatus = I2CSPM_Transfer (I2C0, &transferSequence);
   if(transferStatus < 0)
   {
       LOG_ERROR("I2C TransferInitialisation status %x write: Fail\n\r", (uint32_t)transferStatus);
@@ -92,7 +92,7 @@ transferSequence.buf[0].data = (uint8_t*)read_data; // pointer to data to read
 transferSequence.buf[0].len = 2;
 //I2C_TransferInit(I2C0, &transferSequence);
 
-NVIC_EnableIRQ(I2C0_IRQn);
+//NVIC_EnableIRQ(I2C0_IRQn);
 //LOG_INFO("i2c read_cmd\n\r");
 transferStatus = I2C_TransferInit(I2C0,&transferSequence);
 if(transferStatus < 0) {
@@ -102,3 +102,103 @@ if(transferStatus < 0) {
   return transferStatus;
 }
 
+I2C_TransferReturn_TypeDef i2c_veml6030_write_cmd(uint8_t cmd,uint16_t data)
+{
+
+// Send Measure Temperature command
+      I2C_TransferReturn_TypeDef     transferStatus;
+      //uint8_t send_data[2] = {(data&0xFF), (data>>8)&0xFF};
+      transferSequence.addr = VEML6030_DEVICE_ADDR << 1; // shift device address left
+      transferSequence.flags = I2C_FLAG_WRITE_WRITE;
+      transferSequence.buf[0].data = &cmd; // pointer to data to write
+      transferSequence.buf[0].len = 1;
+      transferSequence.buf[1].data = (uint8_t*)&data; // pointer to data to write
+      transferSequence.buf[1].len = 2;
+//NVIC_EnableIRQ(I2C0_IRQn);
+//LOG_INFO("i2c_wri_cmd\n\r");
+      transferStatus = I2CSPM_Transfer (I2C0, &transferSequence);
+  if(transferStatus < 0)
+  {
+      LOG_ERROR("I2C TransferInitialisation status %x write: Fail\n\r", (uint32_t)transferStatus);
+  }
+return transferStatus;
+}
+
+/*Function Name: i2c_write_cmd()
+Function use: Read command to Temperature Sensor /
+return type: void*/
+I2C_TransferReturn_TypeDef i2c_veml6030_write_read_cmd(uint8_t cmd, uint16_t *read_data)
+{
+  I2C_TransferReturn_TypeDef transferStatus = 0;
+// Send Measure Temperature command
+
+//cmd_data = TEMPERATURE_READ_CMD;
+transferSequence.addr = VEML6030_DEVICE_ADDR << 1; // shift device address left
+transferSequence.flags = I2C_FLAG_WRITE_READ;
+transferSequence.buf[0].data = &cmd; // pointer to data to read
+transferSequence.buf[0].len = 1;
+transferSequence.buf[1].data = (uint8_t*)read_data; // pointer to data to read
+transferSequence.buf[1].len = 2;
+//I2C_TransferInit(I2C0, &transferSequence);
+
+//NVIC_EnableIRQ(I2C0_IRQn);
+//LOG_INFO("i2c read_cmd\n\r");
+transferStatus = I2CSPM_Transfer (I2C0, &transferSequence);
+if(transferStatus < 0) {
+    LOG_ERROR("I2C TransferInitialisation status %x write: Fail\n\r", (uint32_t)transferStatus);
+}
+
+
+  return transferStatus;
+}
+
+/*Function Name: read_temp_from_si7021()
+Function use: Read temperature from Si7021 sensor /
+return type: void*/
+int read_lux_from_veml6030()
+{
+  I2C_TransferReturn_TypeDef  transfer_status;
+  uint16_t read_lux_data = 0;
+  I2C_init();//I2C init
+ // gpioSi7021sensorOn();//Enable sensor
+  transfer_status =  i2c_veml6030_write_cmd(0x00,2048);
+  if(transfer_status==i2cTransferDone)
+    {
+        //int lux = 0;
+        //uint16_t temp_read = read_data;
+        //temp_read = ((temp_read>>10)&0x3F);//Obtaining temperature LSB
+        //temp_read = (temp_read|(read_data<<8));//Obtaining MSB of temperature
+        //temperature = (175.72 * temp_read)/ 65536- 46.85;
+        //LOG_INFO("LUX VALUE is=%dC\n\r",read_lux_data);
+      LOG_ERROR("PASS");
+    }
+    else
+      {
+        LOG_ERROR("I2C Transfer_status status %x write: Fail\n\r", (uint32_t)transfer_status);
+      }
+  timerdelay(INTEGRATION_TIME);//Delay timer for 100 ms
+  //for(int i = 0; i< 10000000;i++);
+  //transfer_status = i2c_veml6030_write_cmd(0x04,0x00);
+ // for(int i = 0; i< 1000000;i++);
+  //timerdelay(TEMP_READ_WAIT_TIME);//Delay timer for 10.8 ms
+
+  transfer_status = i2c_veml6030_write_read_cmd(0x04,&read_lux_data);
+
+  if(transfer_status==i2cTransferDone)
+  {
+      //int lux = 0;
+      //uint16_t temp_read = read_data;
+      //temp_read = ((temp_read>>10)&0x3F);//Obtaining temperature LSB
+      //temp_read = (temp_read|(read_data<<8));//Obtaining MSB of temperature
+      //temperature = (175.72 * temp_read)/ 65536- 46.85;
+      LOG_INFO("LUX VALUE is=%dC\n\r",read_lux_data);
+
+  }
+  else
+    {
+      LOG_ERROR("I2C Transfer_status status %x write: Fail\n\r", (uint32_t)transfer_status);
+    }
+  //gpioSi7021sensorOff();//Power Off
+  //i2c_deinitialize();
+  return 1;
+}
