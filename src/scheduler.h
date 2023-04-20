@@ -45,9 +45,10 @@ void schedulerSetEventGPIOPB1clear();
 void schedulerSetEventGPIOPB1set();
 void schedulerSetEventGPIOPB0set();
 void schedulerSetEventGPIOPB0clear();
-#if DEVICE_IS_BLE_SERVER
-void temperature_state_machine(sl_bt_msg_t *);
-#else
-void discovery_state_machine(sl_bt_msg_t *);
-#endif
+//#if DEVICE_IS_BLE_SERVER
+//void temperature_state_machine(sl_bt_msg_t *);
+void ambient_light_state_machine(int);
+//#else
+//void discovery_state_machine(sl_bt_msg_t *);
+//#endif
 #endif /* SRC_SCHEDULER_H_ */

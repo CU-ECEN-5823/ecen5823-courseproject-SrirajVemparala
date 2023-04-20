@@ -47,7 +47,6 @@
 #include "gatt_db.h"
 #include "app.h"
 #include "src/i2c.h"
-#include "sl_bt_api.h"
 
 
 // *************************************************
@@ -64,7 +63,6 @@
 #include "src/oscillators.h"
 #include "src/timer.h"
 #include "src/scheduler.h"
-#include "src/ble.h"
 
 // Students: Here is an example of how to correctly include logging functions in
 //           each .c file.
@@ -170,12 +168,8 @@ SL_WEAK void app_init(void)
   gpioInit();
   cmu_init();
   init_LETIMER0();
-  NVIC_ClearPendingIRQ(GPIO_EVEN_IRQn);
-  NVIC_EnableIRQ(GPIO_EVEN_IRQn);
-  NVIC_ClearPendingIRQ(GPIO_ODD_IRQn);
-  NVIC_EnableIRQ(GPIO_ODD_IRQn);
-  //NVIC_ClearPendingIRQ(LETIMER0_IRQn);
-  //NVIC_EnableIRQ(LETIMER0_IRQn);
+  NVIC_ClearPendingIRQ(LETIMER0_IRQn);
+  NVIC_EnableIRQ(LETIMER0_IRQn);
 
 } // app_init()
 
@@ -215,15 +209,15 @@ SL_WEAK void app_process_action(void)
   // Notice: This function is not passed or has access to Bluetooth stack events.
   //         We will create/use a scheme that is far more energy efficient in
   //         later assignments.
-  //uint32_t evt = 0;
+  uint32_t evt = 0;
  // LOG_INFO("Entering Inappprocessaction\n\r");
-   //evt = getNextEvent();
-   //temperature_state_machine(evt);
-  // switch (evt) {
-  //case evtLETimer_UF:
-       read_lux_from_veml6030();
- //  break;
-  // }
+   evt = getNextEvent();
+   ambient_light_state_machine(evt);
+//   switch (evt) {
+//   case evtLETimer_UF:
+//       read_temp_from_si7021();
+//   break;
+//   }
 //  if(uf_int)
 //  {
 //      /*Turn ON LED's 0*/
@@ -255,27 +249,17 @@ void sl_bt_on_event(sl_bt_msg_t *evt)
 {
 
   // Just a trick to hide a compiler warning about unused input parameter evt.
-  //(void) evt;
+  (void) evt;
 
   // For A5 onward:
   // Some events require responses from our application code,
   // and don’t necessarily advance our state machines.
   // For A5 uncomment the next 2 function calls
+  // handle_ble_event(evt); // put this code in ble.c/.h
 
-//   handle_ble_event(evt); // put this code in ble.c/.h
-//#if DEVICE_IS_BLE_SERVER
-//  if(SL_BT_MSG_ID(evt->header) == sl_bt_evt_system_external_signal_id)
-//  {
-//    ble_data_struct_t *bleDataPtr = getBleDataPtr();
-//
-//  // sequence through states driven by events
-//   if(bleDataPtr->flag_ok_to_send_htm_indications == true)
-//   {
-//       temperature_state_machine(evt);    // put this code in scheduler.c/.h
-//   }
-//  }
-//#else
-//  discovery_state_machine(evt);      // put this code in src/scheduler.c/.h
-//#endif
+  // sequence through states driven by events
+  // state_machine(evt);    // put this code in scheduler.c/.h
+
+
 } // sl_bt_on_event()
 

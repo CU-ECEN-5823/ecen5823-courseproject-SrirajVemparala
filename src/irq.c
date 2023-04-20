@@ -2,6 +2,7 @@
  * irq.c
  * Date:        03-02-2022
  * Author:      Raghu Sai Phani Sriraj Vemparala, raghu.vemparala@colorado.edu
+ *              Rajesh Srirangam
  * Description: This file has interrupt handler related information
  *
  *
@@ -39,9 +40,12 @@ void LETIMER0_IRQHandler(void)
     }
   if((flag_value&LETIMER_IF_COMP1))
     {
+      LETIMER_IntDisable(LETIMER0, LETIMER_IEN_COMP1);  //Disable COMP1 interrupt
       schedulerSetEventcomp1set();
     }
 }
+//PIR Sensor
+//Author Rajesh
 /*************
  * @Function void GPIO_EVEN_IRQHandler()
  * @Description Used as GPIO EVEN Interrupt Handler
