@@ -164,7 +164,7 @@ SL_WEAK void app_init(void)
   // Put your application 1-time initialization code here.
   // This is called once during start-up.
   // Don't call any Bluetooth API functions until after the boot event.
-  //sl_power_manager_add_em_requirement(LOWEST_ENERGY_MODE);
+  sl_power_manager_add_em_requirement(LOWEST_ENERGY_MODE);
   gpioInit();
   cmu_init();
   init_LETIMER0();
