@@ -29,9 +29,9 @@
 #define INCLUDE_LOG_DEBUG 1
 #include "log.h"
 
-uint16_t read_data; // temperature data
+uint16_t read_data = 0; // temperature data
 uint16_t read_lux_data = 0;
-
+uint16_t write_register = 2048;
 I2C_TransferReturn_TypeDef transferStatus; // Status of data transfer
 
 //States of I2C machines
@@ -52,14 +52,14 @@ uint16_t myEvent=0;//Events that are triggered
  *@Param NULL
  *@Return NULL
  ****************************************************************/
-void schedulerSetEventTemperaturemeasurement()
+void schedulerSetEventAmbiencemeasurement()
 {
 
   CORE_DECLARE_IRQ_STATE;
   CORE_ENTER_CRITICAL();
   // LOG_INFO("Entering schedulerSetEventTemperaturemeasurement\n\r");
  // sl_bt_external_signal(evtReadTemperature);
-   myEvent |=evtReadTemperature;
+   myEvent |=evtReadAmbientsensor;
   CORE_EXIT_CRITICAL();
 } // schedulerSetEventXXX()
 
@@ -151,7 +151,7 @@ void schedulerSetEventGPIOPB1set()
 void schedulerSetEventPIRtriggeredset()
 {
   //Write code here
-  LOG_INFO("Motion detected!\n");
+  //LOG_INFO("Motion detected!\n");
   gpioLed0SetOn();
 }
 /********************************************************************
@@ -180,17 +180,17 @@ uint32_t getNextEvent()
       //IRQ Disabled
       CORE_DECLARE_IRQ_STATE;
       CORE_ENTER_CRITICAL();
-      if(myEvent && evtReadTemperature)
+      if(myEvent & evtReadAmbientsensor)
       {
-      theEvent = evtReadTemperature; // 1 event to return to the caller
-      myEvent &=~evtReadTemperature;
+        theEvent = evtReadAmbientsensor; // 1 event to return to the caller
+        myEvent &=~evtReadAmbientsensor;
       }
-      else if(myEvent && evti2ccomp1setcomplete)
+      else if(myEvent & evti2ccomp1setcomplete)
       {
         theEvent = evti2ccomp1setcomplete; // 1 event to return to the caller
         myEvent &=~evti2ccomp1setcomplete;
       }
-      else if(myEvent && evti2ctransfercomplete)
+      else if(myEvent & evti2ctransfercomplete)
       {
         theEvent = evti2ctransfercomplete; // 1 event to return to the caller
         myEvent &=~evti2ctransfercomplete;
@@ -217,10 +217,13 @@ void ambient_light_state_machine(int event)
       switch(current_state)
       {
         case i2c_idle:
-          if(event&&evtReadTemperature)
+          if(event == evtReadAmbientsensor)
             {
+              I2C_init();//Initialize I2C
             //  LOG_INFO("State 1\n\r");
-              current_state = i2c_write;
+              i2c_veml6030_write_cmd();
+              //timerwaitus_irq(AMBIENT_READ_WAIT_TIME);
+              current_state = i2c_write_wait;
             }
           break;
         /*case i2c_setup_time:
@@ -234,35 +237,40 @@ void ambient_light_state_machine(int event)
         case i2c_write:
           //LOG_INFO("cw\n\r");
           {
-              I2C_init();//Initialize I2C
-              i2c_veml6030_write_cmd(0x00,2048);
-              sl_power_manager_add_em_requirement(SL_POWER_MANAGER_EM1);//Add sl power management
-              timerwaitus_irq(AMBIENT_READ_WAIT_TIME);
+
+              //sl_power_manager_add_em_requirement(SL_POWER_MANAGER_EM1);//Add sl power management
+              //timerwaitus_irq(AMBIENT_READ_WAIT_TIME);
             //  LOG_INFO("State 4\n\r");
-              NVIC_DisableIRQ(I2C0_IRQn);
-              sl_power_manager_remove_em_requirement(SL_POWER_MANAGER_EM1);
+              //NVIC_DisableIRQ(I2C0_IRQn);
+              //sl_power_manager_remove_em_requirement(SL_POWER_MANAGER_EM1);
               //comp1 update value
              // timerwaitus_irq(AMBIENT_READ_WAIT_TIME);
-              current_state = i2c_read;
+              current_state = i2c_write_wait;
             }
           break;
         case i2c_write_wait://Wait for computation to complete
-          if(event && evti2ccomp1setcomplete)
+          if(event == evti2ctransfercomplete)
             {
+              NVIC_DisableIRQ(I2C0_IRQn);
+              i2c_veml6030_write_read_cmd(&read_lux_data);
               current_state = i2c_read;
             }
+//          else
+//            {
+//              current_state = i2c_write;
+//            }
           break;
         case i2c_read:
-          if(event && evti2ctransfercomplete)
+          if(event == evti2ctransfercomplete)
             {
-              i2c_veml6030_write_read_cmd(0x04,&read_lux_data);
+              //i2c_veml6030_write_read_cmd(0x04,&read_lux_data);
             //  sl_power_manager_add_em_requirement(SL_POWER_MANAGER_EM1);
               //LOG_INFO("State 4\n\r");
               NVIC_DisableIRQ(I2C0_IRQn);
              // sl_power_manager_remove_em_requirement(SL_POWER_MANAGER_EM1);
               LOG_INFO("LUX VALUE is=%d C\n\r",read_lux_data);
               // ble_send_temp(temperature);
-              i2c_deinitialize();
+              //i2c_deinitialize();
               current_state = i2c_idle;
             }
           break;

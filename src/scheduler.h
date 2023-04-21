@@ -23,7 +23,7 @@ typedef enum
 }discovery_state;
 typedef enum
 {
-  evtReadTemperature = 1,
+  evtReadAmbientsensor = 1,
   evti2ccomp1setcomplete = 2,
   evti2ctransfercomplete = 4,
   evtgpiopb0intset = 8,
@@ -37,7 +37,7 @@ static const uint8_t push_button_service[16] = { 0x89, 0x62, 0x13, 0x2d, 0x2a, 0
 // Temperature Measurement characteristic UUID defined by Bluetooth SIG
 static const uint8_t thermo_char[2] = { 0x1c, 0x2a };
 static const uint8_t push_button_char[16] = { 0x89, 0x62, 0x13, 0x2d, 0x2a, 0x65, 0xec, 0x87, 0x3e, 0x43, 0xc8, 0x38, 0x02, 0x00, 0x00, 0x00 };
-void schedulerSetEventTemperaturemeasurement();
+void schedulerSetEventAmbiencemeasurement();
 uint32_t getNextEvent();
 void schedulerSetEventcomp1set();
 void schedulerSetEventi2cTransferDone();

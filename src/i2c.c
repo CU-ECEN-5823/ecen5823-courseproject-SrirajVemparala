@@ -18,7 +18,9 @@
 
 uint8_t cmd_data; // temperature request command data
 I2C_TransferSeq_TypeDef transferSequence; // Data transfer Sequence
-
+uint8_t read_cmd = 0x04;
+uint8_t write_cmd = 0x00;
+uint16_t data = 2048;
 /*Function Name: i2c_deinitialize()
 Function use: Reset i2c after data received /
 return type: void*/
@@ -54,7 +56,7 @@ I2CSPM_Init_TypeDef I2C_Config = {
  //i2c_bus_frequency = I2C_BusFreqGet(I2C0);
 }
 
-void i2c_veml6030_write_cmd(uint8_t cmd,uint16_t data)
+void i2c_veml6030_write_cmd()
 {
 
   // Send Measure Temperature command
@@ -62,11 +64,12 @@ void i2c_veml6030_write_cmd(uint8_t cmd,uint16_t data)
   //uint8_t send_data[2] = {(data&0xFF), (data>>8)&0xFF};
   transferSequence.addr = VEML6030_DEVICE_ADDR << 1; // shift device address left
   transferSequence.flags = I2C_FLAG_WRITE_WRITE;
-  transferSequence.buf[0].data = &cmd; // pointer to data to write
+  transferSequence.buf[0].data = &write_cmd; // pointer to data to write
   transferSequence.buf[0].len = 1;
   transferSequence.buf[1].data = (uint8_t*)&data; // pointer to data to write
   transferSequence.buf[1].len = 2;
   NVIC_EnableIRQ(I2C0_IRQn);
+  //transferStatus = I2CSPM_Transfer (I2C0, &transferSequence);
   transferStatus = I2C_TransferInit(I2C0, &transferSequence);
   if(transferStatus < 0)
     {
@@ -78,7 +81,7 @@ void i2c_veml6030_write_cmd(uint8_t cmd,uint16_t data)
 /*Function Name: i2c_write_cmd()
 Function use: Read command to Temperature Sensor /
 return type: void*/
-void i2c_veml6030_write_read_cmd(uint8_t cmd, uint16_t *read_data)
+void i2c_veml6030_write_read_cmd(uint16_t *read_data)
 {
   I2C_TransferReturn_TypeDef transferStatus = 0;
   // Send Measure Temperature command
@@ -86,12 +89,13 @@ void i2c_veml6030_write_read_cmd(uint8_t cmd, uint16_t *read_data)
   //cmd_data = TEMPERATURE_READ_CMD;
   transferSequence.addr = VEML6030_DEVICE_ADDR << 1; // shift device address left
   transferSequence.flags = I2C_FLAG_WRITE_READ;
-  transferSequence.buf[0].data = &cmd; // pointer to data to read
+  transferSequence.buf[0].data = &read_cmd; // pointer to data to read
   transferSequence.buf[0].len = 1;
   transferSequence.buf[1].data = (uint8_t*)read_data; // pointer to data to read
   transferSequence.buf[1].len = 2;
   NVIC_EnableIRQ(I2C0_IRQn);
   //LOG_INFO("i2c read_cmd\n\r");
+  //transferStatus = I2CSPM_Transfer (I2C0, &transferSequence);
   transferStatus = I2C_TransferInit(I2C0, &transferSequence);
   if(transferStatus < 0) {
       LOG_ERROR("I2C TransferInitialisation status %x write: Fail\n\r", (uint32_t)transferStatus);

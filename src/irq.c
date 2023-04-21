@@ -36,7 +36,7 @@ void LETIMER0_IRQHandler(void)
     {
       log_timer++;
       //Schedule the Event Temperature measurement
-      schedulerSetEventTemperaturemeasurement();
+      schedulerSetEventAmbiencemeasurement();
     }
   if((flag_value&LETIMER_IF_COMP1))
     {
@@ -134,6 +134,7 @@ void I2C0_IRQHandler(void) {
     {
       LOG_ERROR("%d\n\r", transferStatus);
     }
+  LOG_INFO("TS=%d C\n\r",transferStatus);
 }
 
 int letimerMilliseconds()

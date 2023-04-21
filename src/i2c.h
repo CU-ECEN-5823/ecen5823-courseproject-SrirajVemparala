@@ -26,7 +26,7 @@ I2C_TransferReturn_TypeDef i2c_read_cmd();
 //int read_temp_from_si7021();
 void i2c_deinitialize();
 //int read_lux_from_veml6030();
-void i2c_veml6030_write_cmd(uint8_t,uint16_t );
-void i2c_veml6030_write_read_cmd(uint8_t, uint16_t*);
+void i2c_veml6030_write_cmd();
+void i2c_veml6030_write_read_cmd(uint16_t*);
 
 #endif /* SRC_I2C_H_ */
