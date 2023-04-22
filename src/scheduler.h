@@ -45,6 +45,8 @@ void schedulerSetEventGPIOPB1clear();
 void schedulerSetEventGPIOPB1set();
 void schedulerSetEventGPIOPB0set();
 void schedulerSetEventGPIOPB0clear();
+void schedulerSetCountPIR_1_detect();
+void schedulerSetCountPIR_2_detect();
 //#if DEVICE_IS_BLE_SERVER
 //void temperature_state_machine(sl_bt_msg_t *);
 void ambient_light_state_machine(int);

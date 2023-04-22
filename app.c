@@ -170,6 +170,8 @@ SL_WEAK void app_init(void)
   init_LETIMER0();
   NVIC_ClearPendingIRQ(LETIMER0_IRQn);
   NVIC_EnableIRQ(LETIMER0_IRQn);
+  NVIC_ClearPendingIRQ(GPIO_EVEN_IRQn);
+  NVIC_EnableIRQ(GPIO_EVEN_IRQn);
 
 } // app_init()
 

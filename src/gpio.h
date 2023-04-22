@@ -33,9 +33,10 @@
 #define PB0_pin   6
 #define PB1_port  gpioPortF
 #define PB1_pin   7
-#define PIR_SENSOR_PORT  gpioPortD
-#define PIR_SENSOR_PIN   10
-
+#define PIR_SENSOR_PORT_1  gpioPortD
+#define PIR_SENSOR_PIN_1   10
+#define PIR_SENSOR_PORT_2  gpioPortD
+#define PIR_SENSOR_PIN_2   12
 // Function prototypes
 void gpioInit();
 void gpioLed0SetOn();

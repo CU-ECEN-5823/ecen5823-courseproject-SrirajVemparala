@@ -68,15 +68,19 @@ void GPIO_EVEN_IRQHandler(void)
     {
       schedulerSetEventPIRtriggeredset();
     }*/
-   if (GPIO_PinInGet(PIR_SENSOR_PORT, PIR_SENSOR_PIN))
+   if (GPIO_PinInGet(PIR_SENSOR_PORT_1, PIR_SENSOR_PIN_1))
    {
-    LOG_INFO("Motion detected!\n\r");
-    gpioLed0SetOn();
+    //LOG_INFO("Detect PIR 1!\n\r");
+    //gpioLed0SetOn();
+    schedulerSetCountPIR_1_detect();
+    //pir_1=true;
    }
-   else
+   if (GPIO_PinInGet(PIR_SENSOR_PORT_2, PIR_SENSOR_PIN_2))
    {
-       LOG_INFO("Motion not detected!\n\r");
-       gpioLed0SetOff();
+    //LOG_INFO("Detect PIR 2!\n\r");
+   // gpioLed1SetOn();
+    schedulerSetCountPIR_2_detect();
+    //pir_2=true;
    }
  /* while (1)
   {
@@ -134,7 +138,7 @@ void I2C0_IRQHandler(void) {
     {
       LOG_ERROR("%d\n\r", transferStatus);
     }
-  LOG_INFO("TS=%d C\n\r",transferStatus);
+  //LOG_INFO("TS=%d C\n\r",transferStatus);
 }
 
 int letimerMilliseconds()
