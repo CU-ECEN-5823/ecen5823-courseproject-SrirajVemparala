@@ -8,4 +8,5 @@ Project Members </br>
 2. Rajesh Srirangam <br>
 
 Schedule Page </br>
- URL to you project schedule page : "https://github.com/CU-ECEN-5823/ecen5823-courseproject-SrirajVemparala". <br>
+ Project Schedule URL : "https://github.com/CU-ECEN-5823/ecen5823-courseproject-SrirajVemparala/wiki/Project-Schedule" <br>
+ Project Overview URL : "https://github.com/CU-ECEN-5823/ecen5823-courseproject-SrirajVemparala/wiki/Project-Overview" <br>
