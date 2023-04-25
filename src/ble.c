@@ -2,6 +2,7 @@
  * ble.c
  * Date:        25-02-2022
  * Author:      Raghu Sai Phani Sriraj Vemparala, raghu.vemparala@colorado.edu
+                Rajesh
  * Description: This file has BLE related information
  *
  *
@@ -458,6 +459,50 @@ void handle_ble_event(sl_bt_msg_t *evt)
               gpioLed1SetOn();
             }
         }
+      //Author :Rajesh
+      else if(evt->data.evt_gatt_server_characteristic_status.characteristic == gattdb_lux_measurement)
+             {
+              // if((evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_confirmation)) //Check in flight flag status //Reference provided for this line -Khyati TA
+              //   {
+              //     bleDataPtr->flag_in_flight=false;
+              //   }
+               if((evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_client_config)) //Reference provided by David Sluiter(Professor)
+                 {
+                   if((evt->data.evt_gatt_server_characteristic_status.client_config_flags == sl_bt_gatt_server_indication)) //Check htm status //Reference provided for this line -Khyati TA
+                     {
+                       bleDataPtr->flag_ok_to_send_htm_indications = true;
+                       gpioLed0SetOn();
+                     }
+                   else if((evt->data.evt_gatt_server_characteristic_status.client_config_flags ==sl_bt_gatt_server_disable )) //Check htm status
+                     {
+                       bleDataPtr->flag_ok_to_send_htm_indications = false;
+                       gpioLed0SetOff();
+                       displayPrintf(DISPLAY_ROW_TEMPVALUE,"");
+                     }
+                 }
+             }
+      //Author:Rajesh
+      else if(evt->data.evt_gatt_server_characteristic_status.characteristic == gattdb_IR_Detection)
+                 {
+                //   if((evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_confirmation)) //Check in flight flag status //Reference provided for this line -Khyati TA
+                 //    {
+                 //      bleDataPtr->flag_in_flight=false;
+                 //    }
+                   if((evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_client_config)) //Reference provided by David Sluiter(Professor)
+                     {
+                       if((evt->data.evt_gatt_server_characteristic_status.client_config_flags == sl_bt_gatt_server_indication)) //Check htm status //Reference provided for this line -Khyati TA
+                         {
+                           bleDataPtr->flag_ok_to_send_htm_indications = true;
+                           gpioLed0SetOn();
+                         }
+                       else if((evt->data.evt_gatt_server_characteristic_status.client_config_flags ==sl_bt_gatt_server_disable )) //Check htm status
+                         {
+                           bleDataPtr->flag_ok_to_send_htm_indications = false;
+                           gpioLed0SetOff();
+                           displayPrintf(DISPLAY_ROW_TEMPVALUE,"");
+                         }
+                     }
+                 }
       else
         {
 

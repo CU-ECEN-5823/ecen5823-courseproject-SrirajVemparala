@@ -49,7 +49,7 @@ void schedulerSetCountPIR_1_detect();
 void schedulerSetCountPIR_2_detect();
 //#if DEVICE_IS_BLE_SERVER
 //void temperature_state_machine(sl_bt_msg_t *);
-void ambient_light_state_machine(int);
+void ambient_light_state_machine(sl_bt_msg_t *evt);
 //#else
 //void discovery_state_machine(sl_bt_msg_t *);
 //#endif

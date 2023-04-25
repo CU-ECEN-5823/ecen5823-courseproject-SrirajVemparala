@@ -211,10 +211,10 @@ SL_WEAK void app_process_action(void)
   // Notice: This function is not passed or has access to Bluetooth stack events.
   //         We will create/use a scheme that is far more energy efficient in
   //         later assignments.
-  uint32_t evt = 0;
+ // uint32_t evt = 0;
  // LOG_INFO("Entering Inappprocessaction\n\r");
-   evt = getNextEvent();
-   ambient_light_state_machine(evt);
+ //  evt = getNextEvent();
+  // ambient_light_state_machine(evt);
 //   switch (evt) {
 //   case evtLETimer_UF:
 //       read_temp_from_si7021();
@@ -257,11 +257,12 @@ void sl_bt_on_event(sl_bt_msg_t *evt)
   // Some events require responses from our application code,
   // and don’t necessarily advance our state machines.
   // For A5 uncomment the next 2 function calls
-  // handle_ble_event(evt); // put this code in ble.c/.h
+  handle_ble_event(evt); // put this code in ble.c/.h
 
   // sequence through states driven by events
   // state_machine(evt);    // put this code in scheduler.c/.h
-
-
+#if DEVICE_IS_BLE_SERVER
+  ambient_light_state_machine(evt);
+#endif
 } // sl_bt_on_event()
 

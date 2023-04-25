@@ -56,7 +56,7 @@ typedef struct {
 
 
 ble_data_struct_t* getBleDataPtr(void);
-void handle_ble_event(sl_bt_msg_t *);
+void handle_ble_event(sl_bt_msg_t *evt);
 #if DEVICE_IS_BLE_SERVER
 void ble_send_temp(uint32_t);
 void ble_send_pb0_indication(uint8_t);
