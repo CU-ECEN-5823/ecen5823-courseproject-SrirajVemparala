@@ -215,4 +215,48 @@ Summary:
       </descriptor>
     </characteristic>
   </service>
+
+  <!--VEML6030_measurement-->
+  <service advertise="true" name="VEML6030_measurement" requirement="mandatory" sourceId="" type="primary" uuid="eaf2db9a-e972-4484-8260-71d2937d7fd4">
+
+    <!--Luminosity_measurement-->
+    <characteristic const="false" id="lux_measurement" name="Luminosity_measurement" sourceId="" uuid="bb9f9a3d-33c2-4884-94dc-9100d9b33493">
+      <value length="3" type="hex" variable_length="false">00</value>
+      <properties>
+        <read authenticated="false" bonded="true" encrypted="false"/>
+        <indicate authenticated="false" bonded="true" encrypted="false"/>
+      </properties>
+
+      <!--Client Characteristic Configuration-->
+      <descriptor const="false" discoverable="true" id="luminosity_client_characteristic_configuration_6" name="Client Characteristic Configuration" sourceId="org.bluetooth.descriptor.gatt.client_characteristic_configuration" uuid="2902">
+        <properties>
+          <read authenticated="false" bonded="false" encrypted="false"/>
+          <write authenticated="false" bonded="false" encrypted="false"/>
+        </properties>
+        <value length="2" type="hex" variable_length="false">00</value>
+      </descriptor>
+    </characteristic>
+  </service>
+
+  <!--PIR_measurement-->
+  <service advertise="true" name="PIR_measurement" requirement="mandatory" sourceId="" type="primary" uuid="bde8cc97-889d-465b-a3ea-04ee574c5a52">
+
+    <!--IR_Detection-->
+    <characteristic const="false" id="IR_Detection" name="IR_Detection" sourceId="" uuid="fcdb1db2-e383-4e46-af48-7a55c42cc2db">
+      <value length="2" type="hex" variable_length="false">00</value>
+      <properties>
+        <read authenticated="false" bonded="true" encrypted="false"/>
+        <indicate authenticated="false" bonded="true" encrypted="false"/>
+      </properties>
+
+      <!--Client Characteristic Configuration-->
+      <descriptor const="false" discoverable="true" id="irdetection_client_characteristic_configuration_7" name="Client Characteristic Configuration" sourceId="org.bluetooth.descriptor.gatt.client_characteristic_configuration" uuid="2902">
+        <properties>
+          <read authenticated="false" bonded="false" encrypted="false"/>
+          <write authenticated="false" bonded="false" encrypted="false"/>
+        </properties>
+        <value length="2" type="hex" variable_length="false">00</value>
+      </descriptor>
+    </characteristic>
+  </service>
 </gatt>
