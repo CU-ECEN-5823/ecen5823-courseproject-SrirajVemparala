@@ -123,20 +123,20 @@ static uint32_t nextPtr(uint32_t ptr)
 void enque_characteristics(uint16_t charHandles,uint32_t bufferLength,uint8_t* buffer)
 {
   if(length <QUEUE_DEPTH)
-  {
+    {
 
-    //Store the data into queue
+      //Store the data into queue
       characteristics[wptr].charHandle = charHandles;
       characteristics[wptr].bufferLength = bufferLength;
       for(uint32_t i =0;i<bufferLength;i++)
-      {
-         characteristics[wptr].buffer[i] = buffer[i];
-      }
+        {
+          characteristics[wptr].buffer[i] = buffer[i];
+        }
 
-     wptr = nextPtr(wptr);
-     length++;
-     //LOG_INFO("length =%dC\n\r",length);
-  }
+      wptr = nextPtr(wptr);
+      length++;
+      //LOG_INFO("length =%dC\n\r",length);
+    }
 }
 void dequeue_characteristics()
 {
@@ -186,9 +186,13 @@ void handle_ble_event(sl_bt_msg_t *evt)
   switch (SL_BT_MSG_ID(evt->header))                       //Check for BLE Event
   {
     case sl_bt_evt_system_boot_id:                         //System Boot Started
+      bleDataPtr->flag_connection_open_close = false;
+      bleDataPtr->flag_ok_to_send_ambient_light_indications = false;
+      bleDataPtr->flag_ok_to_send_PIR_indications = false;
+      bleDataPtr->flag_in_flight=false;
       displayInit();
-    //  bleDataPtr->bonding_complete = false;
-    //  bleDataPtr->confirm_pass_key = false;
+      //  bleDataPtr->bonding_complete = false;
+      //  bleDataPtr->confirm_pass_key = false;
 #if DEVICE_IS_BLE_SERVER
       displayPrintf(DISPLAY_ROW_NAME, "Server");
 #else
@@ -202,13 +206,13 @@ void handle_ble_event(sl_bt_msg_t *evt)
           LOG_ERROR("sl_bt_system_get_identity_address() returned != 0 status=0x%04x", (unsigned int) sc);
           break;
         }
-    //  else
-  //      {
-     //     displayPrintf(DISPLAY_ROW_BTADDR, "%x:%x:%x:%x:%x:%x",
-    //                    bleDataPtr->myAddress.addr[0], bleDataPtr->myAddress.addr[1],
-     //                   bleDataPtr->myAddress.addr[2], bleDataPtr->myAddress.addr[3],
-     //                   bleDataPtr->myAddress.addr[4], bleDataPtr->myAddress.addr[5]);
-     //   }
+      //  else
+      //      {
+      //     displayPrintf(DISPLAY_ROW_BTADDR, "%x:%x:%x:%x:%x:%x",
+      //                    bleDataPtr->myAddress.addr[0], bleDataPtr->myAddress.addr[1],
+      //                   bleDataPtr->myAddress.addr[2], bleDataPtr->myAddress.addr[3],
+      //                   bleDataPtr->myAddress.addr[4], bleDataPtr->myAddress.addr[5]);
+      //   }
 #if DEVICE_IS_BLE_SERVER               //Server Mode
       sc=sl_bt_advertiser_create_set(&bleDataPtr->advertisingSetHandle);
       if (sc != SL_STATUS_OK)
@@ -227,19 +231,19 @@ void handle_ble_event(sl_bt_msg_t *evt)
         {
           LOG_ERROR("sl_bt_advertiser_start() returned != 0 status=0x%04x", (unsigned int) sc);
         }
-     // sl_bt_sm_configure(SM_CONFIGURATION_FLAG, sm_io_capability_displayyesno);
+      // sl_bt_sm_configure(SM_CONFIGURATION_FLAG, sm_io_capability_displayyesno);
 
-//            sc= sl_bt_sm_delete_bondings();
-//                  if (sc != SL_STATUS_OK)
-//                  {
-//                           LOG_ERROR("sl_bt_sm_delete_bondings() returned != 0 status=0x%04x", (unsigned int) sc);
-//                           break;
-//                  }
-//                  else
-//                    {
-//                      bleDataPtr->bonding_complete = false;
-//                    }
-   //   displayPrintf(DISPLAY_ROW_CONNECTION, "Advertising");
+      //            sc= sl_bt_sm_delete_bondings();
+      //                  if (sc != SL_STATUS_OK)
+      //                  {
+      //                           LOG_ERROR("sl_bt_sm_delete_bondings() returned != 0 status=0x%04x", (unsigned int) sc);
+      //                           break;
+      //                  }
+      //                  else
+      //                    {
+      //                      bleDataPtr->bonding_complete = false;
+      //                    }
+      //   displayPrintf(DISPLAY_ROW_CONNECTION, "Advertising");
 
 #else             //Client Mode
       sc =   sl_bt_scanner_set_mode(sl_bt_gap_1m_phy, SCAN_PASSIVE);
@@ -273,10 +277,10 @@ void handle_ble_event(sl_bt_msg_t *evt)
 #endif
       break;
     case sl_bt_evt_connection_opened_id:           //Event connection is Opened
-      bleDataPtr->connection_handle=evt->data.evt_connection_opened.connection;
-#if DEVICE_IS_BLE_SERVER    //Server Mode
+      // bleDataPtr->connection_handle=evt->data.evt_connection_opened.connection;
+      //#if DEVICE_IS_BLE_SERVER    //Server Mode
       bleDataPtr->ble_connection_handle=evt->data.evt_connection_opened.connection;
-      sl_bt_advertiser_stop(bleDataPtr->advertisingSetHandle);
+      sc= sl_bt_advertiser_stop(bleDataPtr->advertisingSetHandle);
 
       if (sc != SL_STATUS_OK)
         {
@@ -289,15 +293,15 @@ void handle_ble_event(sl_bt_msg_t *evt)
           LOG_ERROR("sl_bt_connection_set_parameters() returned != 0 status=0x%04x", (unsigned int) sc);
           break;
         }
-      else
-        {
-          bleDataPtr->flag_connection_open_close = true;
+      //    else
+      //    {
+      bleDataPtr->flag_connection_open_close = true;
 
-          //displayPrintf(DISPLAY_ROW_CONNECTION, "Connected" );
-       //   displayPrintf(DISPLAY_ROW_9, "" );
-        }
+      //displayPrintf(DISPLAY_ROW_CONNECTION, "Connected" );
+      //   displayPrintf(DISPLAY_ROW_9, "" );
+      //  }
 
-   /*   sl_status_t   timer_response;//Trigger dequeue() every 250ms
+      /*   sl_status_t   timer_response;//Trigger dequeue() every 250ms
       timer_response = sl_bt_system_set_soft_timer(TWOFIFTY_MILLISECOND,QUEUE_HANDLE,CONTINUOUS_TIMER);
       if (timer_response != SL_STATUS_OK)
       {
@@ -309,18 +313,18 @@ void handle_ble_event(sl_bt_msg_t *evt)
                     LOG_ERROR("sl_bt_sm_delete_bondings() returned != 0 status=0x%04x", (unsigned int) sc);
                     break;
       }*/
-#else
-      bleDataPtr->flag_connection_open_close = true;
+      //#else
+      //    bleDataPtr->flag_connection_open_close = true;
 
-      displayPrintf(DISPLAY_ROW_BTADDR2, "%x:%x:%x:%x:%x:%x", ble_data.server_addr.addr[0], \
-                    ble_data.server_addr.addr[1], ble_data.server_addr.addr[2], \
-                    ble_data.server_addr.addr[3], ble_data.server_addr.addr[4], \
-                    ble_data.server_addr.addr[5]);
+      /*displayPrintf(DISPLAY_ROW_BTADDR2, "%x:%x:%x:%x:%x:%x", ble_data.server_addr.addr[0], \
+                  //  ble_data.server_addr.addr[1], ble_data.server_addr.addr[2], \
+                    //ble_data.server_addr.addr[3], ble_data.server_addr.addr[4], \
+                    //ble_data.server_addr.addr[5]);*/
 
-#endif
-    //  displayPrintf(DISPLAY_ROW_CONNECTION, "Connected");
+      //#endif
+      //  displayPrintf(DISPLAY_ROW_CONNECTION, "Connected");
       break;
-  /*  case sl_bt_evt_sm_confirm_passkey_id:
+      /*  case sl_bt_evt_sm_confirm_passkey_id:
       {
       uint32_t passkey = evt->data.evt_sm_confirm_passkey.passkey;
       bleDataPtr->confirm_pass_key = true;
@@ -329,7 +333,7 @@ void handle_ble_event(sl_bt_msg_t *evt)
       //sl_bt_sm_passkey_confirm(bleDataPtr->ble_connection_handle,0x01);
       }
       break;*/
-  /*  case sl_bt_evt_sm_bonded_id:
+      /*  case sl_bt_evt_sm_bonded_id:
       bleDataPtr->bonding_complete = true;
       displayPrintf(DISPLAY_ROW_CONNECTION, "Bonded" );
       #if DEVICE_IS_BLE_SERVER
@@ -341,7 +345,7 @@ void handle_ble_event(sl_bt_msg_t *evt)
       displayPrintf(DISPLAY_ROW_9,"Button Released");
       #endif
       break;*/
-/*#if DEVICE_IS_BLE_SERVER
+      /*#if DEVICE_IS_BLE_SERVER
     case sl_bt_evt_sm_confirm_bonding_id:
 
       if(evt->data.evt_sm_confirm_bonding.bonding_handle == SL_BT_INVALID_BONDING_HANDLE)
@@ -355,27 +359,31 @@ void handle_ble_event(sl_bt_msg_t *evt)
       }
       break;
 #endif*/
- /*   case sl_bt_evt_sm_bonding_failed_id:
+      /*   case sl_bt_evt_sm_bonding_failed_id:
       bleDataPtr->bonding_complete = false;
       LOG_ERROR("Bonding Failed");
       break;*/
     case sl_bt_evt_connection_closed_id:                   //Event Connection is closed
-    //  bleDataPtr->flag_ok_to_send_htm_indications = false;
-     // bleDataPtr->flag_ok_to_send_pb0_indications = false;
-      bleDataPtr->flag_ok_to_send_ambient_light_indications=false;
-      bleDataPtr->flag_ok_to_send_PIR_indications=false;
+      //  bleDataPtr->flag_ok_to_send_htm_indications = false;
+      // bleDataPtr->flag_ok_to_send_pb0_indications = false;
+      //bleDataPtr->flag_ok_to_send_ambient_light_indications=false;
+      // bleDataPtr->flag_ok_to_send_PIR_indications=false;
+      // bleDataPtr->flag_connection_open_close = false;
+      //   bleDataPtr->bonding_complete = false;
+      //  bleDataPtr->confirm_pass_key = false;
+      // bleDataPtr->flag_in_flight = false;
       bleDataPtr->flag_connection_open_close = false;
-   //   bleDataPtr->bonding_complete = false;
-    //  bleDataPtr->confirm_pass_key = false;
-      bleDataPtr->flag_in_flight = false;
-     // gpioLed0SetOff();
-    //  gpioLed1SetOff();
-    //  sc= sl_bt_sm_delete_bondings();
-    //  if (sc != SL_STATUS_OK)
-   //   {
-    //                LOG_ERROR("sl_bt_sm_delete_bondings() returned != 0 status=0x%04x", (unsigned int) sc);
-    //                break;
-    //  }
+      bleDataPtr->flag_ok_to_send_ambient_light_indications = false;
+      bleDataPtr->flag_ok_to_send_PIR_indications = false;
+      bleDataPtr->flag_in_flight=false;
+      // gpioLed0SetOff();
+      //  gpioLed1SetOff();
+      //  sc= sl_bt_sm_delete_bondings();
+      //  if (sc != SL_STATUS_OK)
+      //   {
+      //                LOG_ERROR("sl_bt_sm_delete_bondings() returned != 0 status=0x%04x", (unsigned int) sc);
+      //                break;
+      //  }
 #if DEVICE_IS_BLE_SERVER        //Server Mode
       //Advertisement Start
       sc=sl_bt_advertiser_start(bleDataPtr->advertisingSetHandle,sl_bt_advertiser_general_discoverable,sl_bt_advertiser_connectable_scannable);
@@ -384,20 +392,20 @@ void handle_ble_event(sl_bt_msg_t *evt)
           LOG_ERROR("sl_bt_advertiser_start() returned != 0 status=0x%04x", (unsigned int) sc);
           break;
         }
-      else
-        {
-        //  displayPrintf(DISPLAY_ROW_CONNECTION, "Advertising" );
-        }
-    //  sc= sl_bt_sm_delete_bondings();
-   //   if (sc != SL_STATUS_OK)
-   //   {
-     //          LOG_ERROR("sl_bt_sm_delete_bondings() returned != 0 status=0x%04x", (unsigned int) sc);
-       //        break;
-    //  }
+      // else
+      // {
+      //  displayPrintf(DISPLAY_ROW_CONNECTION, "Advertising" );
+      //}
+      //  sc= sl_bt_sm_delete_bondings();
+      //   if (sc != SL_STATUS_OK)
+      //   {
+      //          LOG_ERROR("sl_bt_sm_delete_bondings() returned != 0 status=0x%04x", (unsigned int) sc);
+      //        break;
+      //  }
       // handle close events
-   //   displayPrintf(DISPLAY_ROW_TEMPVALUE,"");
-   //   displayPrintf(DISPLAY_ROW_ACTION,"");
-   //   displayPrintf(DISPLAY_ROW_9,"");
+      //   displayPrintf(DISPLAY_ROW_TEMPVALUE,"");
+      //   displayPrintf(DISPLAY_ROW_ACTION,"");
+      //   displayPrintf(DISPLAY_ROW_9,"");
 #else         //Client Mode
       sc = sl_bt_scanner_start(sl_bt_gap_1m_phy, sl_bt_scanner_discover_generic);
       if(sc != SL_STATUS_OK) {
@@ -406,23 +414,24 @@ void handle_ble_event(sl_bt_msg_t *evt)
       displayPrintf(DISPLAY_ROW_CONNECTION, "Discovering");
       displayPrintf(DISPLAY_ROW_9, "");
 #endif
-     // displayPrintf(DISPLAY_ROW_TEMPVALUE, "");
-     // displayPrintf(DISPLAY_ROW_BTADDR2, "");
+      // displayPrintf(DISPLAY_ROW_TEMPVALUE, "");
+      // displayPrintf(DISPLAY_ROW_BTADDR2, "");
       break;
 #if DEVICE_IS_BLE_SERVER
     case sl_bt_evt_connection_parameters_id://printing the connection values provided by the Client
       LOG_INFO("Interval = %d\n\r Latency = %d\n\r Timeout = %d\n\r",(int)((evt->data.evt_connection_parameters.interval)*1.25),
-              (int)(evt->data.evt_connection_parameters.latency),
+               (int)(evt->data.evt_connection_parameters.latency),
                (int)((evt->data.evt_connection_parameters.timeout)));
       break;
 #endif
-  /*  case sl_bt_evt_system_soft_timer_id:
+   // case sl_bt_evt_system_soft_timer_id:
       //Indicates that a soft timer has lapsed.
-      if(evt->data.evt_system_soft_timer.handle==0)
-      {
-          displayUpdate();
-      }
-#if DEVICE_IS_BLE_SERVER
+     // if(evt->data.evt_system_soft_timer.handle==0)
+       // {
+         // displayUpdate();
+        //}
+      //break;
+      /*#if DEVICE_IS_BLE_SERVER
       if(evt->data.evt_system_soft_timer.handle==1)
       {
           ble_data_struct_t *bleDataPtr = getBleDataPtr();
@@ -431,10 +440,10 @@ void handle_ble_event(sl_bt_msg_t *evt)
              dequeue_characteristics();
            }
       }*/
-//#endif
-    //  break;
+      //#endif
+      //  break;
 #if DEVICE_IS_BLE_SERVER
-   /* case sl_bt_evt_gatt_server_characteristic_status_id://Verify if data is updated in GATT server and ack received from Client
+      /* case sl_bt_evt_gatt_server_characteristic_status_id://Verify if data is updated in GATT server and ack received from Client
       if(evt->data.evt_gatt_server_characteristic_status.client_config_flags == sl_bt_gatt_server_disable)
         {
           if(evt->data.evt_gatt_server_characteristic_status.characteristic == gattdb_temperature_measurement)
@@ -463,72 +472,72 @@ void handle_ble_event(sl_bt_msg_t *evt)
             }
         }*/
       //Author :Rajesh
-       if(evt->data.evt_gatt_server_characteristic_status.characteristic == gattdb_lux_measurement)
-             {
-               if((evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_confirmation)) //Check in flight flag status //Reference provided for this line -Khyati TA
-                 {
-                   bleDataPtr->flag_in_flight=false;
+      if(evt->data.evt_gatt_server_characteristic_status.characteristic == gattdb_lux_measurement)
+        {
+          if((evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_confirmation)) //Check in flight flag status //Reference provided for this line -Khyati TA
+            {
+              bleDataPtr->flag_in_flight=false;
+            }
+          if((evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_client_config)) //Reference provided by David Sluiter(Professor)
+            {
+              if((evt->data.evt_gatt_server_characteristic_status.client_config_flags == sl_bt_gatt_server_indication)) //Check htm status //Reference provided for this line -Khyati TA
+                {
+                  bleDataPtr->flag_ok_to_send_ambient_light_indications = true;
+                  //gpioLed0SetOn();
                 }
-               if((evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_client_config)) //Reference provided by David Sluiter(Professor)
-                 {
-                   if((evt->data.evt_gatt_server_characteristic_status.client_config_flags == sl_bt_gatt_server_indication)) //Check htm status //Reference provided for this line -Khyati TA
-                     {
-                       bleDataPtr->flag_ok_to_send_ambient_light_indications = true;
-                       gpioLed0SetOn();
-                     }
-                   else if((evt->data.evt_gatt_server_characteristic_status.client_config_flags ==sl_bt_gatt_server_disable )) //Check htm status
-                     {
-                       bleDataPtr->flag_ok_to_send_ambient_light_indications = false;
-                       gpioLed0SetOff();
-                      // displayPrintf(DISPLAY_ROW_TEMPVALUE,"");
-                     }
-                 }
-             }
+              else if((evt->data.evt_gatt_server_characteristic_status.client_config_flags ==sl_bt_gatt_server_disable )) //Check htm status
+                {
+                  bleDataPtr->flag_ok_to_send_ambient_light_indications = false;
+                  //gpioLed0SetOff();
+                  // displayPrintf(DISPLAY_ROW_TEMPVALUE,"");
+                }
+            }
+        }
       //Author:Rajesh
-       if(evt->data.evt_gatt_server_characteristic_status.characteristic == gattdb_IR_Detection)
-                 {
-                   if((evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_confirmation)) //Check in flight flag status //Reference provided for this line -Khyati TA
-                    {
-                     bleDataPtr->flag_in_flight=false;
-                     }
-                   if((evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_client_config)) //Reference provided by David Sluiter(Professor)
-                     {
-                       if((evt->data.evt_gatt_server_characteristic_status.client_config_flags == sl_bt_gatt_server_indication)) //Check htm status //Reference provided for this line -Khyati TA
-                         {
-                           bleDataPtr->flag_ok_to_send_PIR_indications = true;
-                           gpioLed0SetOn();
-                         }
-                       else if((evt->data.evt_gatt_server_characteristic_status.client_config_flags ==sl_bt_gatt_server_disable )) //Check htm status
-                         {
-                           bleDataPtr->flag_ok_to_send_PIR_indications = false;
-                           gpioLed0SetOff();
-                         //  displayPrintf(DISPLAY_ROW_TEMPVALUE,"");
-                         }
-                     }
-                 }
+      if(evt->data.evt_gatt_server_characteristic_status.characteristic == gattdb_IR_Detection)
+        {
+          if((evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_confirmation)) //Check in flight flag status //Reference provided for this line -Khyati TA
+            {
+              bleDataPtr->flag_in_flight=false;
+            }
+          if((evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_client_config)) //Reference provided by David Sluiter(Professor)
+            {
+              if((evt->data.evt_gatt_server_characteristic_status.client_config_flags == sl_bt_gatt_server_indication)) //Check htm status //Reference provided for this line -Khyati TA
+                {
+                  bleDataPtr->flag_ok_to_send_PIR_indications = true;
+                 // gpioLed1SetOn();
+                }
+              else if((evt->data.evt_gatt_server_characteristic_status.client_config_flags ==sl_bt_gatt_server_disable )) //Check htm status
+                {
+                  bleDataPtr->flag_ok_to_send_PIR_indications = false;
+                 // gpioLed1SetOff();
+                  //  displayPrintf(DISPLAY_ROW_TEMPVALUE,"");
+                }
+            }
+        }
       else
         {
 
         }
-  //    if(evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_confirmation)
-  //      {
-   //       bleDataPtr->flag_in_flight = false;
-    //    }
+      //    if(evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_confirmation)
+      //      {
+      //       bleDataPtr->flag_in_flight = false;
+      //    }
       break;
     case sl_bt_evt_gatt_server_indication_timeout_id://Check for timeout condition
       if (bleDataPtr->flag_in_flight == true)
         {
           LOG_ERROR("Error in indication\n\r");
         }
-      bleDataPtr->flag_ok_to_send_htm_indications = false;
-     // bleDataPtr->flag_ok_to_send_pb0_indications = false;
+      //   bleDataPtr->flag_ok_to_send_htm_indications = false;
+      // bleDataPtr->flag_ok_to_send_pb0_indications = false;
       bleDataPtr->flag_in_flight=false;
-     // bleDataPtr->bonding_complete = false;
-     // bleDataPtr->confirm_pass_key = false;
-     // gpioLed0SetOff();
-     // gpioLed1SetOff();
+      // bleDataPtr->bonding_complete = false;
+      // bleDataPtr->confirm_pass_key = false;
+      // gpioLed0SetOff();
+      // gpioLed1SetOff();
       break;
-    /*case sl_bt_evt_system_external_signal_id:
+      /*case sl_bt_evt_system_external_signal_id:
       if(evt->data.evt_system_external_signal.extsignals == evtgpiopb0intset)
       {
           if(bleDataPtr->bonding_complete == true)
@@ -557,16 +566,16 @@ void handle_ble_event(sl_bt_msg_t *evt)
 #else
     case sl_bt_evt_system_external_signal_id:
       if(evt->data.evt_system_external_signal.extsignals == evtgpiopb0intclear)//press
-      {
+        {
           //4 bits are used to obtain the PB0-press; PB0-release; PB1-Press;PB1-Release for indication
           //Bit number                      0      ;  1         ;     2    ;    3
-                if(bleDataPtr->confirm_pass_key == true)
-                {
-                    sl_bt_sm_passkey_confirm(bleDataPtr->connection_handle,0x01);
-                    bleDataPtr->confirm_pass_key = false;
-                }
-                button_state |= (1<<0);
-      }
+          if(bleDataPtr->confirm_pass_key == true)
+            {
+              sl_bt_sm_passkey_confirm(bleDataPtr->connection_handle,0x01);
+              bleDataPtr->confirm_pass_key = false;
+            }
+          button_state |= (1<<0);
+        }
       else if(evt->data.evt_system_external_signal.extsignals == evtgpiopb0intset)//release
         {
           button_state |= (1<<1);
@@ -607,46 +616,46 @@ void handle_ble_event(sl_bt_msg_t *evt)
 
         }
       if(evt->data.evt_system_external_signal.extsignals == evtgpiopb1intset)//release
-      {
+        {
           if(button_state != 0x05)
-          {
-            button_state = 0x00;
-          }
+            {
+              button_state = 0x00;
+            }
           else
-          {
+            {
               button_state |= (1<<3);
-          }
+            }
 
-      }
+        }
       else if(evt->data.evt_system_external_signal.extsignals == evtgpiopb1intclear)//press
-      {
+        {
           //Check for PB0 also
           if((bleDataPtr->flag_in_flight == false) && (button_state!= 0x01))
-          {
-          sc = sl_bt_gatt_read_characteristic_value(bleDataPtr->connection_handle,gattdb_button_state);//Obtain read information
-          bleDataPtr->flag_in_flight = true;
-          if (sc != SL_STATUS_OK)
             {
-              LOG_ERROR("sl_bt_gatt_read_characteristic_value() returned != 0 status=0x%04x", (unsigned int) sc);
-              break;
+              sc = sl_bt_gatt_read_characteristic_value(bleDataPtr->connection_handle,gattdb_button_state);//Obtain read information
+              bleDataPtr->flag_in_flight = true;
+              if (sc != SL_STATUS_OK)
+                {
+                  LOG_ERROR("sl_bt_gatt_read_characteristic_value() returned != 0 status=0x%04x", (unsigned int) sc);
+                  break;
+                }
             }
-          }
           else
-          {
+            {
               button_state |= (1<<2);
-          }
-      }
+            }
+        }
       else
-      {
+        {
 
-      }
+        }
       break;
     case sl_bt_evt_gatt_procedure_completed_id:
       bleDataPtr->flag_in_flight = false;
-          if(evt->data.evt_gatt_procedure_completed.result == SL_STATUS_BT_ATT_INSUFFICIENT_ENCRYPTION)
-            {
-              sl_bt_sm_increase_security(bleDataPtr->connection_handle);//Increase security for push button
-            }
+      if(evt->data.evt_gatt_procedure_completed.result == SL_STATUS_BT_ATT_INSUFFICIENT_ENCRYPTION)
+        {
+          sl_bt_sm_increase_security(bleDataPtr->connection_handle);//Increase security for push button
+        }
       break;
     case sl_bt_evt_scanner_scan_report_id://Connection established
       {
@@ -697,56 +706,56 @@ void handle_ble_event(sl_bt_msg_t *evt)
     case sl_bt_evt_gatt_characteristic_value_id:
       // Indicates that GATT server transmitted data
       if(evt->data.evt_gatt_characteristic_value.att_opcode == sl_bt_gatt_read_response)
-      {
+        {
           bleDataPtr->button_value = (evt->data.evt_gatt_characteristic_value.value.data[0]);
           if( bleDataPtr->button_value == 0x01)
-          {
+            {
               displayPrintf(DISPLAY_ROW_9, "Button Pressed");
-          }
+            }
           else
-          {
+            {
 
               displayPrintf(DISPLAY_ROW_9, "Button Released");
-          }
+            }
           bleDataPtr->flag_in_flight = false;
-      }
+        }
       else
         {
           sc = sl_bt_gatt_send_characteristic_confirmation(bleDataPtr->connection_handle);
-           if(sc != SL_STATUS_OK)
-           {
-                LOG_ERROR("sl_bt_gatt_set_characteristic_notification() returned != 0 status=0x%04x\n\r", (unsigned int)sc);
-                break;
-           }
+          if(sc != SL_STATUS_OK)
+            {
+              LOG_ERROR("sl_bt_gatt_set_characteristic_notification() returned != 0 status=0x%04x\n\r", (unsigned int)sc);
+              break;
+            }
           if(evt->data.evt_gatt_characteristic_value.characteristic == gattdb_temperature_measurement)
-          {
-          //Save the value which you have received from server
+            {
+              //Save the value which you have received from server
               if(bleDataPtr->bonding_complete != true)
-              {
+                {
                   displayPrintf(DISPLAY_ROW_CONNECTION, "Handling Indications");
-              }
+                }
               bleDataPtr->temp_value = &(evt->data.evt_gatt_characteristic_value.value.data[0]);
               temperature_in_c = FLOAT_TO_INT32((bleDataPtr->temp_value));
               displayPrintf(DISPLAY_ROW_TEMPVALUE, "temp=%d",temperature_in_c);
-          }
+            }
           if(evt->data.evt_gatt_characteristic_value.characteristic == gattdb_button_state)
-          {
-             bleDataPtr->button_value = (evt->data.evt_gatt_characteristic_value.value.data[1]);
-                if( bleDataPtr->button_value == 0x01)
+            {
+              bleDataPtr->button_value = (evt->data.evt_gatt_characteristic_value.value.data[1]);
+              if( bleDataPtr->button_value == 0x01)
                 {
-                    displayPrintf(DISPLAY_ROW_9, "Button Pressed");
+                  displayPrintf(DISPLAY_ROW_9, "Button Pressed");
 
                 }
-                else
+              else
                 {
-                    displayPrintf(DISPLAY_ROW_9, "Button Released");
+                  displayPrintf(DISPLAY_ROW_9, "Button Released");
                 }
-          }
+            }
           else
-          {
+            {
 
-          }
-      }
+            }
+        }
       break;
 #endif
   }
@@ -873,9 +882,9 @@ void ambient_light_measurement()
   ALS_buffer[1] = *ALS_value;
   ble_data_struct_t *bleDataPtr = getBleDataPtr();
   sc=sl_bt_gatt_server_write_attribute_value(gattdb_lux_measurement,0,1,&ALS_buffer[1]);
-  LOG_INFO("ALS Value: %d\n\r",*ALS_value);
+  // LOG_INFO("ALS Value: %d\n\r",*ALS_value);
   //displayPrintf("ALS Value: %d\n\r",*ALS_value);
-  displayPrintf(DISPLAY_ROW_10,"ALS Value: %d\n\r",*ALS_value);
+  displayPrintf(DISPLAY_ROW_9,"ALS Value: %d\n\r",*ALS_value);
   if(bleDataPtr->flag_connection_open_close == true  && bleDataPtr->flag_ok_to_send_ambient_light_indications == true)
     {
       if(bleDataPtr->flag_in_flight == false)
@@ -890,6 +899,7 @@ void ambient_light_measurement()
               bleDataPtr->flag_in_flight = true;
             }
         }
+      // displayPrintf(DISPLAY_ROW_10,"ALS Value: %d\n\r",*ALS_value);
     }
 }
 //Author rajesh
@@ -898,13 +908,14 @@ int PIR_measurement()
   uint8_t PIR_buffer[2];
   PIR_buffer[1] = pir_count;
   ble_data_struct_t *bleDataPtr = getBleDataPtr();
-  sc=sl_bt_gatt_server_write_attribute_value(gattdb_lux_measurement,0,1,&PIR_buffer[1]);
+  sc=sl_bt_gatt_server_write_attribute_value(gattdb_IR_Detection,0,1,&PIR_buffer[1]);
   //LOG_INFO("ALS Value: %d\n\r",*ALS_value);
+  displayPrintf(DISPLAY_ROW_10,"PIR Value: %d\n\r",pir_count);
   if(bleDataPtr->flag_connection_open_close == true  && bleDataPtr->flag_ok_to_send_PIR_indications == true)
     {
       if(bleDataPtr->flag_in_flight == false)
         {
-          sc = sl_bt_gatt_server_send_indication(bleDataPtr->ble_connection_handle,gattdb_lux_measurement,2,PIR_buffer);
+          sc = sl_bt_gatt_server_send_indication(bleDataPtr->ble_connection_handle,gattdb_IR_Detection,2,PIR_buffer);
           if (sc != SL_STATUS_OK)
             {
               LOG_ERROR("sl_bt_gatt_server_send_indication() returned != 0 status=0x%04x", (unsigned int) sc);
