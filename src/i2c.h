@@ -18,7 +18,7 @@
 
 #define VEML6030_DEVICE_ADDR 0x48
 #define LUX_READ_CMD 0x04
-
+extern uint8_t* ALS_value;
 
 void I2C_init();
 void i2c_write_cmd();

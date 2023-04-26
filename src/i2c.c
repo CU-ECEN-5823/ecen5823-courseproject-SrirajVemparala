@@ -21,6 +21,7 @@ I2C_TransferSeq_TypeDef transferSequence; // Data transfer Sequence
 uint8_t read_cmd = 0x04;
 uint8_t write_cmd = 0x00;
 uint16_t data = 2048;
+uint8_t* ALS_value;
 /*Function Name: i2c_deinitialize()
 Function use: Reset i2c after data received /
 return type: void*/
@@ -100,6 +101,7 @@ void i2c_veml6030_write_read_cmd(uint16_t *read_data)
   if(transferStatus < 0) {
       LOG_ERROR("I2C TransferInitialisation status %x write: Fail\n\r", (uint32_t)transferStatus);
   }
+  ALS_value=(uint8_t*)read_data;
   //return transferStatus;
 }
 

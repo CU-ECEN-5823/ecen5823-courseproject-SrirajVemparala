@@ -10,6 +10,7 @@
 #include "stdint.h"
 #include "sl_bt_api.h"
 #include "src/ble_device_type.h"
+extern uint8_t pir_count;
 typedef enum
 {
   PRIMARY_CHAR_UUID,
