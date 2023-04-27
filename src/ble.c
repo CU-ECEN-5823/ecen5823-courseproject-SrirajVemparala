@@ -486,13 +486,13 @@ void handle_ble_event(sl_bt_msg_t *evt)
                 {
                   bleDataPtr->flag_ok_to_send_ambient_light_indications = true;
 
-                  //gpioLed0SetOn();
+                  gpioLed0SetOn();
                 }
               else if((evt->data.evt_gatt_server_characteristic_status.client_config_flags ==sl_bt_gatt_server_disable )) //Check htm status
                 {
                   bleDataPtr->flag_ok_to_send_ambient_light_indications = false;
-                  //gpioLed0SetOff();
-                  displayPrintf(DISPLAY_ROW_TEMPVALUE,"");
+                  gpioLed0SetOff();
+                 // displayPrintf(DISPLAY_ROW_TEMPVALUE,"");
                   // displayPrintf(DISPLAY_ROW_TEMPVALUE,"");
                 }
             }
@@ -509,12 +509,12 @@ void handle_ble_event(sl_bt_msg_t *evt)
               if((evt->data.evt_gatt_server_characteristic_status.client_config_flags == sl_bt_gatt_server_indication)) //Check htm status //Reference provided for this line -Khyati TA
                 {
                   bleDataPtr->flag_ok_to_send_PIR_indications = true;
-                 // gpioLed1SetOn();
+                  gpioLed1SetOn();
                 }
               else if((evt->data.evt_gatt_server_characteristic_status.client_config_flags ==sl_bt_gatt_server_disable )) //Check htm status
                 {
                   bleDataPtr->flag_ok_to_send_PIR_indications = false;
-                 // gpioLed1SetOff();
+                  gpioLed1SetOff();
                   //  displayPrintf(DISPLAY_ROW_TEMPVALUE,"");
                 }
             }
@@ -882,10 +882,10 @@ void handle_ble_event(sl_bt_msg_t *evt)
 //Author Rajesh
 void ambient_light_measurement()
 {
-  uint8_t ALS_buffer[2];
-  ALS_buffer[1] = *ALS_value;
+  uint8_t ALS_buffer[3];
+  ALS_buffer[2] = *ALS_value;
   ble_data_struct_t *bleDataPtr = getBleDataPtr();
-  sc=sl_bt_gatt_server_write_attribute_value(gattdb_lux_measurement,0,1,&ALS_buffer[1]);
+  sc=sl_bt_gatt_server_write_attribute_value(gattdb_lux_measurement,0,2,&ALS_buffer[1]);
   LOG_INFO("ALS Value: %d\n\r",*ALS_value);
   //displayPrintf("ALS Value: %d\n\r",*ALS_value);
   displayPrintf(DISPLAY_ROW_TEMPVALUE,"ALS Value: %d",*ALS_value);
@@ -893,7 +893,7 @@ void ambient_light_measurement()
     {
       if(bleDataPtr->flag_in_flight == false)
         {
-          sc = sl_bt_gatt_server_send_indication(bleDataPtr->ble_connection_handle,gattdb_lux_measurement,2,ALS_buffer);
+          sc = sl_bt_gatt_server_send_indication(bleDataPtr->ble_connection_handle,gattdb_lux_measurement,3,ALS_buffer);
           if (sc != SL_STATUS_OK)
             {
               LOG_ERROR("sl_bt_gatt_server_send_indication() returned != 0 status=0x%04x", (unsigned int) sc);
@@ -915,6 +915,7 @@ void PIR_measurement()
   ble_data_struct_t *bleDataPtr = getBleDataPtr();
   sc=sl_bt_gatt_server_write_attribute_value(gattdb_IR_Detection,0,1,&PIR_buffer[1]);
   //LOG_INFO("ALS Value: %d\n\r",*ALS_value);
+ // LOG_INFO("PIR Value: %d\n\r",pir_count);
   displayPrintf(DISPLAY_ROW_10,"PIR Value: %d",pir_count);
   if(bleDataPtr->flag_connection_open_close == true  && bleDataPtr->flag_ok_to_send_PIR_indications == true)
     {
@@ -930,6 +931,7 @@ void PIR_measurement()
               bleDataPtr->flag_in_flight = true;
             }
         }
+      LOG_INFO("PIR Value: %d\n\r",pir_count);
     }
  // return pir_count;
 }

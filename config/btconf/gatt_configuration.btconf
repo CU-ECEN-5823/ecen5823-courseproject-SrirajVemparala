@@ -217,13 +217,12 @@ Summary:
   </service>
 
   <!--VEML6030_measurement-->
-  <service advertise="true" name="VEML6030_measurement" requirement="mandatory" sourceId="" type="primary" uuid="eaf2db9a-e972-4484-8260-71d2937d7fd4">
+  <service advertise="true" id="veml_test" name="VEML6030_measurement" requirement="mandatory" sourceId="" type="primary" uuid="eaf2db9a-e972-4484-8260-71d2937d7fd4">
 
     <!--Luminosity_measurement-->
     <characteristic const="false" id="lux_measurement" name="Luminosity_measurement" sourceId="" uuid="bb9f9a3d-33c2-4884-94dc-9100d9b33493">
       <value length="3" type="hex" variable_length="false">00</value>
       <properties>
-        <read authenticated="false" bonded="true" encrypted="false"/>
         <indicate authenticated="false" bonded="true" encrypted="false"/>
       </properties>
 
