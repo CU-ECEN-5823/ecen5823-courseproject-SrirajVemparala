@@ -223,6 +223,7 @@ Summary:
     <characteristic const="false" id="lux_measurement" name="Luminosity_measurement" sourceId="" uuid="bb9f9a3d-33c2-4884-94dc-9100d9b33493">
       <value length="3" type="hex" variable_length="false">00</value>
       <properties>
+        <read authenticated="false" bonded="true" encrypted="false"/>
         <indicate authenticated="false" bonded="true" encrypted="false"/>
       </properties>
 

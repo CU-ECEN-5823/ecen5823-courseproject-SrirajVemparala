@@ -70,14 +70,14 @@ void GPIO_EVEN_IRQHandler(void)
     }*/
    if (GPIO_PinInGet(PIR_SENSOR_PORT_1, PIR_SENSOR_PIN_1))
    {
-    //LOG_INFO("Detect PIR 1!\n\r");
+    LOG_INFO("Detect PIR 1!\n\r");
     //gpioLed0SetOn();
     schedulerSetCountPIR_1_detect();
     //pir_1=true;
    }
    if (GPIO_PinInGet(PIR_SENSOR_PORT_2, PIR_SENSOR_PIN_2))
    {
-    //LOG_INFO("Detect PIR 2!\n\r");
+    LOG_INFO("Detect PIR 2!\n\r");
    // gpioLed1SetOn();
     schedulerSetCountPIR_2_detect();
     //pir_2=true;

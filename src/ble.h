@@ -64,7 +64,7 @@ void ble_send_pb0_indication(uint8_t);
 void enque_characteristics(uint16_t ,uint32_t ,uint8_t* );
 void dequeue_characteristics();
 void ambient_light_measurement();
-int PIR_measurement();
+void PIR_measurement();
 #endif
 ble_data_struct_t* getBleDataPtr(void);
 

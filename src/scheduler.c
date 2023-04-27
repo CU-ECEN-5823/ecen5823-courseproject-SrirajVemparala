@@ -72,12 +72,13 @@ void schedulerSetCountPIR_1_detect()
   CORE_ENTER_CRITICAL();
   // LOG_INFO("Entering schedulerSetEventTemperaturemeasurement\n\r");
   // sl_bt_external_signal(evtReadTemperature);
-  pir_1= true;
-  if(pir_2 == true)
-  {
-      pir_2 = false;
-      pir_count--;
-  }
+  pir_1 = true;
+  if (pir_2)
+    {
+    pir_2 = false;
+    pir_count--;
+    LOG_INFO("Exit PIR count = %d\n\r", pir_count);
+    }
   CORE_EXIT_CRITICAL();
 } // schedulerSetEventXXX()
 
@@ -94,12 +95,14 @@ void schedulerSetCountPIR_2_detect()
   CORE_ENTER_CRITICAL();
   // LOG_INFO("Entering schedulerSetEventTemperaturemeasurement\n\r");
   // sl_bt_external_signal(evtReadTemperature);
-  pir_2= true;
-  if(pir_1 == true)
-  {
-      pir_1 = false;
-      pir_count++;
-  }
+  pir_2 = true;
+  if (pir_1)
+    {
+    pir_1 = false;
+    pir_count++;
+    LOG_INFO("Entry PIR count = %d\n\r", pir_count);
+    }
+
   CORE_EXIT_CRITICAL();
 } // schedulerSetEventXXX()
 void schedulerSetEventAmbiencemeasurement()
@@ -268,7 +271,7 @@ void ambient_light_state_machine(sl_bt_msg_t *evt)
   // uint32_t eventValue = evt->data.evt_system_external_signal.extsignals;
   static uint32_t current_state = i2c_init;
 
-  if(PIR_measurement() > 0)
+  if(pir_count > 0)
     {
       if(SL_BT_MSG_ID(evt->header) == sl_bt_evt_system_external_signal_id)
       {
@@ -299,6 +302,9 @@ void ambient_light_state_machine(sl_bt_msg_t *evt)
               NVIC_DisableIRQ(I2C0_IRQn);
               sl_power_manager_remove_em_requirement(SL_POWER_MANAGER_EM1);
               ambient_light_measurement();
+              LOG_INFO("i2c cal Before func pir =%d\n\r",pir_count);
+              PIR_measurement();
+              LOG_INFO("i2c cal after func pir =%d\n\r",pir_count);
              // LOG_INFO("LUX VALUE is=%d C\n\r",read_lux_data);
               current_state = i2c_init;
             }

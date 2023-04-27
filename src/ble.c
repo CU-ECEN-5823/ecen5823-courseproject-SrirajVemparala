@@ -231,19 +231,19 @@ void handle_ble_event(sl_bt_msg_t *evt)
         {
           LOG_ERROR("sl_bt_advertiser_start() returned != 0 status=0x%04x", (unsigned int) sc);
         }
-       sl_bt_sm_configure(SM_CONFIGURATION_FLAG, sm_io_capability_displayyesno);
+     //  sl_bt_sm_configure(SM_CONFIGURATION_FLAG, sm_io_capability_displayyesno);
 
-                  sc= sl_bt_sm_delete_bondings();
-                        if (sc != SL_STATUS_OK)
-                        {
-                                 LOG_ERROR("sl_bt_sm_delete_bondings() returned != 0 status=0x%04x", (unsigned int) sc);
-                                 break;
-                        }
-                        else
-                          {
-                            bleDataPtr->bonding_complete = false;
-                          }
-         displayPrintf(DISPLAY_ROW_CONNECTION, "Advertising");
+       //           sc= sl_bt_sm_delete_bondings();
+         //               if (sc != SL_STATUS_OK)
+           //             {
+             //                    LOG_ERROR("sl_bt_sm_delete_bondings() returned != 0 status=0x%04x", (unsigned int) sc);
+               //                  break;
+                 //       }
+                     //   else
+                   //       {
+                       //     bleDataPtr->bonding_complete = false;
+                         // }
+        // displayPrintf(DISPLAY_ROW_CONNECTION, "Advertising");
 
 #else             //Client Mode
       sc =   sl_bt_scanner_set_mode(sl_bt_gap_1m_phy, SCAN_PASSIVE);
@@ -297,8 +297,8 @@ void handle_ble_event(sl_bt_msg_t *evt)
         {
       bleDataPtr->flag_connection_open_close = true;
 
-        displayPrintf(DISPLAY_ROW_CONNECTION, "Connected" );
-         displayPrintf(DISPLAY_ROW_9, "" );
+       // displayPrintf(DISPLAY_ROW_CONNECTION, "Connected" );
+         //displayPrintf(DISPLAY_ROW_9, "" );
         }
 
       /*   sl_status_t   timer_response;//Trigger dequeue() every 250ms
@@ -324,18 +324,18 @@ void handle_ble_event(sl_bt_msg_t *evt)
       #endif
       //  displayPrintf(DISPLAY_ROW_CONNECTION, "Connected");
       break;
-      case sl_bt_evt_sm_confirm_passkey_id:
-      {
-      uint32_t passkey = evt->data.evt_sm_confirm_passkey.passkey;
-      bleDataPtr->confirm_pass_key = true;
-      displayPrintf(DISPLAY_ROW_PASSKEY,"%d",passkey);
-      displayPrintf(DISPLAY_ROW_ACTION,"Confirm with PB0");
+    //  case sl_bt_evt_sm_confirm_passkey_id:
+      //{
+      //uint32_t passkey = evt->data.evt_sm_confirm_passkey.passkey;
+      //bleDataPtr->confirm_pass_key = true;
+      //displayPrintf(DISPLAY_ROW_PASSKEY,"%d",passkey);
+      //displayPrintf(DISPLAY_ROW_ACTION,"Confirm with PB0");
       //sl_bt_sm_passkey_confirm(bleDataPtr->ble_connection_handle,0x01);
-      }
-      break;
-      case sl_bt_evt_sm_bonded_id:
-        bleDataPtr->bonding_complete = true;
-        displayPrintf(DISPLAY_ROW_CONNECTION, "Bonded" );
+      //}
+      //break;
+      //case sl_bt_evt_sm_bonded_id:
+       // bleDataPtr->bonding_complete = true;
+        //displayPrintf(DISPLAY_ROW_CONNECTION, "Bonded" );
 #if DEVICE_IS_BLE_SERVER
         displayPrintf(DISPLAY_ROW_9, "Button Released");
 #endif
@@ -345,8 +345,8 @@ void handle_ble_event(sl_bt_msg_t *evt)
         displayPrintf(DISPLAY_ROW_9,"Button Released");
 #endif
         break;
-#if DEVICE_IS_BLE_SERVER
-    case sl_bt_evt_sm_confirm_bonding_id:
+/*#if DEVICE_IS_BLE_SERVER
+  //  case sl_bt_evt_sm_confirm_bonding_id:
 
       if(evt->data.evt_sm_confirm_bonding.bonding_handle == SL_BT_INVALID_BONDING_HANDLE)
       {
@@ -362,7 +362,7 @@ void handle_ble_event(sl_bt_msg_t *evt)
   case sl_bt_evt_sm_bonding_failed_id:
       bleDataPtr->bonding_complete = false;
       LOG_ERROR("Bonding Failed");
-      break;
+      break;*/
     case sl_bt_evt_connection_closed_id:                   //Event Connection is closed
       //  bleDataPtr->flag_ok_to_send_htm_indications = false;
       // bleDataPtr->flag_ok_to_send_pb0_indications = false;
@@ -378,22 +378,22 @@ void handle_ble_event(sl_bt_msg_t *evt)
       bleDataPtr->flag_in_flight=false;
       // gpioLed0SetOff();
       //  gpioLed1SetOff();
-        sc= sl_bt_sm_delete_bondings();
+      /*  sc= sl_bt_sm_delete_bondings();
         if (sc != SL_STATUS_OK)
          {
                       LOG_ERROR("sl_bt_sm_delete_bondings() returned != 0 status=0x%04x", (unsigned int) sc);
                       break;
-        }
+        }*/
 
-#if DEVICE_IS_BLE_SERVER        //Server Mode
+//#if DEVICE_IS_BLE_SERVER        //Server Mode
       //Advertisement Start
+   // case sl_bt_evt_connection_closed_id:
       sc=sl_bt_advertiser_start(bleDataPtr->advertisingSetHandle,sl_bt_advertiser_general_discoverable,sl_bt_advertiser_connectable_scannable);
-      if (sc != SL_STATUS_OK)
-        {
+      if (sc != SL_STATUS_OK) {
           LOG_ERROR("sl_bt_advertiser_start() returned != 0 status=0x%04x", (unsigned int) sc);
-          break;
-        }
-      else
+      }
+      break;
+     /* else
         {
           displayPrintf(DISPLAY_ROW_CONNECTION, "Advertising" );
         }
@@ -417,7 +417,7 @@ void handle_ble_event(sl_bt_msg_t *evt)
 #endif
        displayPrintf(DISPLAY_ROW_TEMPVALUE, "");
        displayPrintf(DISPLAY_ROW_BTADDR2, "");
-      break;
+      break;*/
 #if DEVICE_IS_BLE_SERVER
     case sl_bt_evt_connection_parameters_id://printing the connection values provided by the Client
       LOG_INFO("Interval = %d\n\r Latency = %d\n\r Timeout = %d\n\r",(int)((evt->data.evt_connection_parameters.interval)*1.25),
@@ -886,9 +886,9 @@ void ambient_light_measurement()
   ALS_buffer[1] = *ALS_value;
   ble_data_struct_t *bleDataPtr = getBleDataPtr();
   sc=sl_bt_gatt_server_write_attribute_value(gattdb_lux_measurement,0,1,&ALS_buffer[1]);
-  // LOG_INFO("ALS Value: %d\n\r",*ALS_value);
+  LOG_INFO("ALS Value: %d\n\r",*ALS_value);
   //displayPrintf("ALS Value: %d\n\r",*ALS_value);
-  displayPrintf(DISPLAY_ROW_9,"ALS Value: %d\n\r",*ALS_value);
+  displayPrintf(DISPLAY_ROW_TEMPVALUE,"ALS Value: %d",*ALS_value);
   if(bleDataPtr->flag_connection_open_close == true  && bleDataPtr->flag_ok_to_send_ambient_light_indications == true)
     {
       if(bleDataPtr->flag_in_flight == false)
@@ -904,17 +904,18 @@ void ambient_light_measurement()
             }
         }
       // displayPrintf(DISPLAY_ROW_10,"ALS Value: %d\n\r",*ALS_value);
+      LOG_INFO("ALS Value: %d\n\r",*ALS_value);
     }
 }
 //Author rajesh
-int PIR_measurement()
+void PIR_measurement()
 {
   uint8_t PIR_buffer[2];
   PIR_buffer[1] = pir_count;
   ble_data_struct_t *bleDataPtr = getBleDataPtr();
   sc=sl_bt_gatt_server_write_attribute_value(gattdb_IR_Detection,0,1,&PIR_buffer[1]);
   //LOG_INFO("ALS Value: %d\n\r",*ALS_value);
-  displayPrintf(DISPLAY_ROW_10,"PIR Value: %d\n\r",pir_count);
+  displayPrintf(DISPLAY_ROW_10,"PIR Value: %d",pir_count);
   if(bleDataPtr->flag_connection_open_close == true  && bleDataPtr->flag_ok_to_send_PIR_indications == true)
     {
       if(bleDataPtr->flag_in_flight == false)
@@ -930,7 +931,7 @@ int PIR_measurement()
             }
         }
     }
-  return pir_count;
+ // return pir_count;
 }
 
 #endif
