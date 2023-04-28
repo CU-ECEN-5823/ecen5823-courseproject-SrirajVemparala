@@ -85,6 +85,7 @@ queue_struct_t characteristics[QUEUE_DEPTH];
 // indications back to an integer. Convert IEEE-11073 32-bit float to signed integer.
 // -----------------------------------------------
 #if !(DEVICE_IS_BLE_SERVER)
+uint16_t lux_value =0;
 // -----------------------------------------------
 // Private function, original from Dan Walkes. I fixed a sign extension bug.
 // We'll need this for Client A7 assignment to convert health thermometer
@@ -659,6 +660,7 @@ void handle_ble_event(sl_bt_msg_t *evt)
       //                                                           (const uint8_t*)thermo_char);
       break;
     case sl_bt_evt_gatt_characteristic_value_id:
+
       // Indicates that GATT server transmitted data
 //      if(evt->data.evt_gatt_characteristic_value.att_opcode == sl_bt_gatt_read_response)
 //        {
@@ -687,11 +689,10 @@ void handle_ble_event(sl_bt_msg_t *evt)
 //                {
                   displayPrintf(DISPLAY_ROW_CONNECTION, "Handling Indications");
                 //}
-              bleDataPtr->lux_value = (evt->data.evt_gatt_characteristic_value.value.data[0]);
-              bleDataPtr->lux_value = (bleDataPtr->lux_value)<<8 & 0xFF00;
-              bleDataPtr->lux_value =    bleDataPtr->lux_value | (evt->data.evt_gatt_characteristic_value.value.data[1]);
+              bleDataPtr->lux_value = (evt->data.evt_gatt_characteristic_value.value.data[2]);
+              lux_value =    bleDataPtr->lux_value | ((evt->data.evt_gatt_characteristic_value.value.data[1])<<8);
               //temperature_in_c = FLOAT_TO_INT32((bleDataPtr->temp_value));
-              displayPrintf(DISPLAY_ROW_TEMPVALUE, "Lux=%d",bleDataPtr->lux_value);
+              displayPrintf(DISPLAY_ROW_TEMPVALUE, "Lux=%d",lux_value);
             }
           if(evt->data.evt_gatt_characteristic_value.characteristic == gattdb_IR_Detection)
             {

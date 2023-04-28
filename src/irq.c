@@ -55,19 +55,9 @@ void LETIMER0_IRQHandler(void)
 /**< GPIO_EVEN IRQ Handler */
 void GPIO_EVEN_IRQHandler(void)
 {
-  GPIO_IntClear(0xFFFFFFFF);
- /* if(GPIO_PinInGet(PB0_port,PB0_pin)==1)
-    {
-      schedulerSetEventGPIOPB0set();
-    }
-  if(GPIO_PinInGet(PB0_port,PB0_pin)==0)
-    {
-      schedulerSetEventGPIOPB0clear();
-    }*/
-  /*if(GPIO_PinInGet(PIR_SENSOR_PORT,PIR_SENSOR_PIN)==1)
-    {
-      schedulerSetEventPIRtriggeredset();
-    }*/
+
+uint32_t int_flag = GPIO_IntGetEnabled();
+GPIO_IntClear(int_flag);
    if (GPIO_PinInGet(PIR_SENSOR_PORT_1, PIR_SENSOR_PIN_1))
    {
    // LOG_INFO("Detect PIR 1!\n\r");
@@ -82,6 +72,7 @@ void GPIO_EVEN_IRQHandler(void)
     schedulerSetCountPIR_2_detect();
     //pir_2=true;
    }
+
  /* while (1)
   {
     uint32_t pirInput = GPIO_PinInGet(PIR_SENSOR_PORT, PIR_SENSOR_PIN);

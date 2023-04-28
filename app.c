@@ -47,7 +47,7 @@
 #include "gatt_db.h"
 #include "app.h"
 #include "src/i2c.h"
-
+#include "src/ble.h"
 
 // *************************************************
 // Students: It is OK to modify this file.
@@ -206,6 +206,8 @@ SL_WEAK void app_init(void)
  *****************************************************************************/
 SL_WEAK void app_process_action(void)
 {
+
+
   // Put your application code here for A1 to A4.
   // This is called repeatedly from the main while(1) loop
   // Notice: This function is not passed or has access to Bluetooth stack events.

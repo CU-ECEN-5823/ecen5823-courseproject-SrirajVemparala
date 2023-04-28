@@ -17,7 +17,7 @@
 #include "src/ble.h"
 #include "src/timer.h"
 #include "gatt_db.h"
-#define INCLUDE_LOG_DEBUG 1
+#define INCLUDE_LOG_DEBUG 0
 #include "src/log.h"
 #include "src/ble_device_type.h"
 #include "src/irq.h"
@@ -28,8 +28,6 @@
 #define AMBIENT_READ_WAIT_TIME 100000 //100 milli sec in microseconds
 //#define TEMP_READ_WAIT_TIME 10800 // 10.8 milli sec microseconds
 
-#define INCLUDE_LOG_DEBUG 1
-#include "log.h"
 
 uint16_t read_data = 0; // temperature data
 uint16_t read_lux_data = 0;
@@ -72,15 +70,20 @@ void schedulerSetCountPIR_1_detect()
   CORE_ENTER_CRITICAL();
   // LOG_INFO("Entering schedulerSetEventTemperaturemeasurement\n\r");
   // sl_bt_external_signal(evtReadTemperature);
+
   pir_1 = true;
+  LOG_INFO("schedulerSetCountPIR_1_detect:pir_2:%d\n\r",pir_2);
+  LOG_INFO("schedulerSetCountPIR_1_detect:pir_1:%d\n\r",pir_1);
     if(pir_2 & pir_1)
     {
+        pir_2 = false;
+        pir_1 = false;
         if(pir_count>0)
         {
           pir_count--;
         }
-      pir_2 = false;
-      pir_1 = false;
+
+
       // LOG_INFO("Exit PIR count = %d\n\r", pir_count);
     }
 
@@ -100,13 +103,17 @@ void schedulerSetCountPIR_2_detect()
   CORE_ENTER_CRITICAL();
   // LOG_INFO("Entering schedulerSetEventTemperaturemeasurement\n\r");
   // sl_bt_external_signal(evtReadTemperature);
+
   pir_2 = true;
+  LOG_INFO("schedulerSetCountPIR_2_detect:pir_2:%d\n\r",pir_2);
+  LOG_INFO("schedulerSetCountPIR_2_detect:pir_1:%d\n\r",pir_1);
   if (pir_1 & pir_2)
     {
+      pir_1 = false;
+      pir_2 = false;
     pir_count++;
-    pir_1 = false;
-    pir_2 = false;
-    //LOG_INFO("Entry PIR count = %d\n\r", pir_count);
+
+
     }
 
   CORE_EXIT_CRITICAL();
