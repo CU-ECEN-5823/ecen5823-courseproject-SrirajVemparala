@@ -33,17 +33,16 @@ typedef struct {
   bd_addr       myAddress;
   bd_addr       server_addr;
   uint8_t       myAddressType;
-  uint8_t       connection_handle;
-  uint8_t       ble_connection_handle;
+  uint8_t       connection_handle;//Client
+  uint8_t       ble_connection_handle;//Server
   uint8_t       characteristic_handle;
-  uint8_t*      temp_value;
-  uint8_t      button_value;
+  uint16_t      lux_value;
+  uint8_t       pir_value;
   // values unique for server
   // The advertising set handle allocated from Bluetooth stack.
   uint8_t       advertisingSetHandle;
   uint8_t       temperatureSetHandle;
-  bool          flag_connection_open_close;            // true when in an open connection
-  bool          flag_ok_to_send_htm_indications; // true when client enabled indications
+  bool          flag_connection_open_close;            //client side true when in an open connection
   bool          flag_ok_to_send_ambient_light_indications; // true when client enabled indications
   bool          flag_ok_to_send_PIR_indications;
   bool          flag_in_flight;
@@ -63,7 +62,7 @@ void ble_send_temp(uint32_t);
 void ble_send_pb0_indication(uint8_t);
 void enque_characteristics(uint16_t ,uint32_t ,uint8_t* );
 void dequeue_characteristics();
-void ambient_light_measurement();
+void ambient_light_measurement(uint16_t);
 void PIR_measurement();
 #endif
 ble_data_struct_t* getBleDataPtr(void);

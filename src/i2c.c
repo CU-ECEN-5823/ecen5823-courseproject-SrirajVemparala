@@ -101,7 +101,7 @@ void i2c_veml6030_write_read_cmd(uint16_t *read_data)
   if(transferStatus < 0) {
       LOG_ERROR("I2C TransferInitialisation status %x write: Fail\n\r", (uint32_t)transferStatus);
   }
-  ALS_value=(uint8_t*)read_data;
+  //ALS_value=(uint8_t*)read_data;
   //return transferStatus;
 }
 
