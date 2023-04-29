@@ -286,7 +286,7 @@ void ambient_light_state_machine(sl_bt_msg_t *evt)
               sl_power_manager_remove_em_requirement(SL_POWER_MANAGER_EM1);
               ambient_light_measurement(read_lux_data);
              // LOG_INFO("i2c cal Before func pir =%d\n\r",pir_count);
-              PIR_measurement();
+
              // LOG_INFO("i2c cal after func pir =%d\n\r",pir_count);
              // LOG_INFO("LUX VALUE is=%d C\n\r",read_lux_data);
               current_state = i2c_init;
