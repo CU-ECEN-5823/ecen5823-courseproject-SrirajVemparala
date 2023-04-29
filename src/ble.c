@@ -493,32 +493,36 @@ void handle_ble_event(sl_bt_msg_t *evt)
        gpioLed0SetOff();
        gpioLed1SetOff();
       break;
-      /*case sl_bt_evt_system_external_signal_id:
-      if(evt->data.evt_system_external_signal.extsignals == evtgpiopb0intset)
+    case sl_bt_evt_system_external_signal_id:
+      if(evt->data.evt_system_external_signal.extsignals == evtgpiopir1intset ||evt->data.evt_system_external_signal.extsignals == evtgpiopir2intset)
       {
-          if(bleDataPtr->bonding_complete == true)
+          if(bleDataPtr->flag_in_flight == false)
             {
-              ble_send_pb0_indication(0x00);
-              displayPrintf(DISPLAY_ROW_9, "Button Released");
+              PIR_measurement();
             }
+//          if(bleDataPtr->bonding_complete == true)
+//            {
+//              ble_send_pb0_indication(0x00);
+//              displayPrintf(DISPLAY_ROW_9, "Button Released");
+//            }
       }
-      else if(evt->data.evt_system_external_signal.extsignals == evtgpiopb0intclear)
-      {
-          if(bleDataPtr->confirm_pass_key == true)
-          {
-              sl_bt_sm_passkey_confirm(bleDataPtr->ble_connection_handle,0x01);
-          }
-          if(bleDataPtr->bonding_complete == true)
-          {
-              ble_send_pb0_indication(0x01);
-              displayPrintf(DISPLAY_ROW_9, "Button Pressed");
-          }
-      }
+//      else if(evt->data.evt_system_external_signal.extsignals == evtgpiopb0intclear)
+//      {
+//          if(bleDataPtr->confirm_pass_key == true)
+//          {
+//              sl_bt_sm_passkey_confirm(bleDataPtr->ble_connection_handle,0x01);
+//          }
+//          if(bleDataPtr->bonding_complete == true)
+//          {
+//              ble_send_pb0_indication(0x01);
+//              displayPrintf(DISPLAY_ROW_9, "Button Pressed");
+//          }
+//      }
       else
       {
 
       }
-      break;*/
+      break;
 #else
 //    case sl_bt_evt_system_external_signal_id:
 //      if(evt->data.evt_system_external_signal.extsignals == evtgpiopb0intclear)//press

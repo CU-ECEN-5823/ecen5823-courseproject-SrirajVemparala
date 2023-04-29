@@ -30,7 +30,9 @@ typedef enum
   evtgpiopb0intset = 8,
   evtgpiopb0intclear = 16,
   evtgpiopb1intset = 32,
-  evtgpiopb1intclear = 64
+  evtgpiopb1intclear = 64,
+  evtgpiopir1intset = 128,
+  evtgpiopir2intset = 256,
 }eventstriggered;
 //// Health Thermometer service UUID defined by Bluetooth SIG
 //static const uint8_t thermo_service[2] = { 0x09, 0x18 };
