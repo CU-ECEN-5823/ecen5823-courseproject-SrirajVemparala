@@ -38,6 +38,7 @@ typedef struct {
   uint8_t       characteristic_handle;
   uint16_t      lux_value;
   uint8_t       pir_value;
+  uint8_t      button_value;
   // values unique for server
   // The advertising set handle allocated from Bluetooth stack.
   uint8_t       advertisingSetHandle;

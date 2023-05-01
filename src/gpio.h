@@ -28,11 +28,10 @@
 #ifndef SRC_GPIO_H_
 #define SRC_GPIO_H_
 #include "em_gpio.h"
-
-#define PB0_port  gpioPortF
-#define PB0_pin   6
-#define PB1_port  gpioPortF
-#define PB1_pin   7
+#define PB0_port   gpioPortF
+#define PB0_pin    6
+#define PB1_port gpioPortF
+#define PB1_pin  7
 #define PIR_SENSOR_PORT_1  gpioPortD
 #define PIR_SENSOR_PIN_1   10
 #define PIR_SENSOR_PORT_2  gpioPortD

@@ -201,8 +201,8 @@ Summary:
     <characteristic const="false" id="button_state" name="ECEN5823 Encrypted Button State" sourceId="" uuid="00000002-38c8-433e-87ec-652a2d136289">
       <value length="1" type="hex" variable_length="false">00</value>
       <properties>
-        <read authenticated="false" bonded="false" encrypted="false"/>
-        <indicate authenticated="false" bonded="false" encrypted="false"/>
+        <read authenticated="false" bonded="true" encrypted="false"/>
+        <indicate authenticated="false" bonded="true" encrypted="false"/>
       </properties>
 
       <!--Client Characteristic Configuration-->
@@ -223,7 +223,8 @@ Summary:
     <characteristic const="false" id="lux_measurement" name="Luminosity_measurement" sourceId="" uuid="bb9f9a3d-33c2-4884-94dc-9100d9b33493">
       <value length="3" type="hex" variable_length="false">00</value>
       <properties>
-        <indicate authenticated="false" bonded="false" encrypted="false"/>
+        <read authenticated="false" bonded="true" encrypted="false"/>
+        <indicate authenticated="false" bonded="true" encrypted="false"/>
       </properties>
 
       <!--Client Characteristic Configuration-->
@@ -244,7 +245,8 @@ Summary:
     <characteristic const="false" id="IR_Detection" name="IR_Detection" sourceId="" uuid="fcdb1db2-e383-4e46-af48-7a55c42cc2db">
       <value length="2" type="hex" variable_length="false">00</value>
       <properties>
-        <indicate authenticated="false" bonded="false" encrypted="false"/>
+        <read authenticated="false" bonded="true" encrypted="false"/>
+        <indicate authenticated="false" bonded="true" encrypted="false"/>
       </properties>
 
       <!--Client Characteristic Configuration-->

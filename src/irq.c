@@ -55,39 +55,30 @@ void LETIMER0_IRQHandler(void)
 /**< GPIO_EVEN IRQ Handler */
 void GPIO_EVEN_IRQHandler(void)
 {
-
-uint32_t int_flag = GPIO_IntGetEnabled();
-GPIO_IntClear(int_flag);
+ // GPIO_IntClear(0xFFFFFFFF);
    if (GPIO_PinInGet(PIR_SENSOR_PORT_1, PIR_SENSOR_PIN_1))
    {
-   // LOG_INFO("Detect PIR 1!\n\r");
-    //gpioLed0SetOn();
     schedulerSetCountPIR_1_detect();
-    //pir_1=true;
    }
    if (GPIO_PinInGet(PIR_SENSOR_PORT_2, PIR_SENSOR_PIN_2))
    {
-  //  LOG_INFO("Detect PIR 2!\n\r");
-   // gpioLed1SetOn();
     schedulerSetCountPIR_2_detect();
-    //pir_2=true;
    }
-
- /* while (1)
-  {
-    uint32_t pirInput = GPIO_PinInGet(PIR_SENSOR_PORT, PIR_SENSOR_PIN);
-    // Check the PIR sensor input and set a flag if motion is detected
-    if (pirInput == 1)
-    {
-        LOG_INFO("Motion detected!\n");
-        gpioLed0SetOn();
-    }
-    else
-        {
-        LOG_INFO("Motion not detected!\n");
-               gpioLed0SetOff();
-        }
-}*/
+   uint32_t gpioInt = GPIO_IntGetEnabled();
+    GPIO_IntClear(gpioInt);
+    if (gpioInt==1<<PB0_pin)
+      {
+   if(GPIO_PinInGet(PB0_port,PB0_pin)==1)
+   {
+       //LOG_INFO("Button Press PB0\n\r");
+       schedulerSetEventGPIOPB0set();
+   }
+   else
+   {
+      // LOG_INFO("Button Release PB0\n\r");
+       schedulerSetEventGPIOPB0clear();
+   }
+}
 }
 /*************
  * @Function void GPIO_EVEN_IRQHandler()
@@ -98,17 +89,21 @@ GPIO_IntClear(int_flag);
 /**< GPIO_ODD IRQ Handler */
 void GPIO_ODD_IRQHandler(void)
 {
-  GPIO_IntClear(0xFFFFFFFF);
+  uint32_t gpioIntodd = GPIO_IntGetEnabled();
+GPIO_IntClear(gpioIntodd);
+if (gpioIntodd==1<<PB1_pin)
+  {
   if(GPIO_PinInGet(PB1_port,PB1_pin)==1)
   {
+      //LOG_INFO("Button Press PB1\n\r");
       schedulerSetEventGPIOPB1set();
   }
-  if(GPIO_PinInGet(PB1_port,PB1_pin)==0)
-  {
+  else  {
+     // LOG_INFO("Button Release PB1\n\r");
       schedulerSetEventGPIOPB1clear();
   }
 }
-
+}
 /*************
  * @Function void I2C0_IRQHandler()
  * @Description Used as LETIMER0 Interrupt Handler
