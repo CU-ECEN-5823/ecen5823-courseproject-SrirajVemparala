@@ -70,12 +70,12 @@ void GPIO_EVEN_IRQHandler(void)
       {
    if(GPIO_PinInGet(PB0_port,PB0_pin)==1)
    {
-       //LOG_INFO("Button Press PB0\n\r");
+       LOG_INFO("Button Press PB0\n\r");
        schedulerSetEventGPIOPB0set();
    }
    else
    {
-      // LOG_INFO("Button Release PB0\n\r");
+       LOG_INFO("Button Release PB0\n\r");
        schedulerSetEventGPIOPB0clear();
    }
 }
@@ -95,11 +95,11 @@ if (gpioIntodd==1<<PB1_pin)
   {
   if(GPIO_PinInGet(PB1_port,PB1_pin)==1)
   {
-      //LOG_INFO("Button Press PB1\n\r");
+      LOG_INFO("Button Press PB1\n\r");
       schedulerSetEventGPIOPB1set();
   }
   else  {
-     // LOG_INFO("Button Release PB1\n\r");
+      LOG_INFO("Button Release PB1\n\r");
       schedulerSetEventGPIOPB1clear();
   }
 }
