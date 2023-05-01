@@ -13,7 +13,7 @@
 #include "em_i2c.h"
 #include  <stdbool.h>
 #include "src/scheduler.h"
-#define INCLUDE_LOG_DEBUG 1
+//#define INCLUDE_LOG_DEBUG 0
 #include "src/log.h"
 #include "src/gpio.h"
 
@@ -55,7 +55,7 @@ void LETIMER0_IRQHandler(void)
 /**< GPIO_EVEN IRQ Handler */
 void GPIO_EVEN_IRQHandler(void)
 {
- // GPIO_IntClear(0xFFFFFFFF);
+   GPIO_IntClear(0xFFFFFFFF);
    if (GPIO_PinInGet(PIR_SENSOR_PORT_1, PIR_SENSOR_PIN_1))
    {
     schedulerSetCountPIR_1_detect();
@@ -64,22 +64,20 @@ void GPIO_EVEN_IRQHandler(void)
    {
     schedulerSetCountPIR_2_detect();
    }
-   uint32_t gpioInt = GPIO_IntGetEnabled();
-    GPIO_IntClear(gpioInt);
-    if (gpioInt==1<<PB0_pin)
-      {
+   //uint32_t gpioInt = GPIO_IntGetEnabled();
+    //GPIO_IntClear(gpioInt);
    if(GPIO_PinInGet(PB0_port,PB0_pin)==1)
    {
-       LOG_INFO("Button Press PB0\n\r");
+       //LOG_INFO("Button Press PB0\n\r");
        schedulerSetEventGPIOPB0set();
    }
    else
    {
-       LOG_INFO("Button Release PB0\n\r");
+      // LOG_INFO("Button Release PB0\n\r");
        schedulerSetEventGPIOPB0clear();
    }
 }
-}
+
 /*************
  * @Function void GPIO_EVEN_IRQHandler()
  * @Description Used as GPIO EVEN Interrupt Handler
@@ -92,7 +90,7 @@ void GPIO_ODD_IRQHandler(void)
   uint32_t gpioIntodd = GPIO_IntGetEnabled();
 GPIO_IntClear(gpioIntodd);
 if (gpioIntodd==1<<PB1_pin)
-  {
+{
   if(GPIO_PinInGet(PB1_port,PB1_pin)==1)
   {
       LOG_INFO("Button Press PB1\n\r");

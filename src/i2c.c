@@ -11,7 +11,7 @@
 #include "i2c.h"
 #include "timer.h"
 #include "gpio.h"
-#define INCLUDE_LOG_DEBUG 1
+//#define INCLUDE_LOG_DEBUG 1
 #include "log.h"
 
 #define INTEGRATION_TIME 100000 // 100 milli sec in microseconds

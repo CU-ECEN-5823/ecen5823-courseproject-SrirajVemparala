@@ -48,7 +48,7 @@ GATT_DATA(const sli_bt_gattdb_value_t gattdb_attribute_field_39) = {
   .data = { 0x52, 0x5a, 0x4c, 0x57, 0xee, 0x04, 0xea, 0xa3, 0x5b, 0x46, 0x9d, 0x88, 0x97, 0xcc, 0xe8, 0xbd, }
 };
 GATT_DATA(sli_bt_gattdb_attribute_chrvalue_t gattdb_attribute_field_37) = {
-  .properties = 0x22,
+  .properties = 0x20,
   .max_len = 3,
   .data = { 0x00, 0x00, 0x00, },
 };
@@ -177,8 +177,8 @@ GATT_DATA(const sli_bt_gattdb_attribute_t gattdb_attributes_map[]) = {
   { .handle = 0x22, .uuid = 0x8000, .permissions = 0x4841, .caps = 0xffff, .state = 0x00, .datatype = 0x01, .dynamicdata = &gattdb_attribute_field_33 },
   { .handle = 0x23, .uuid = 0x0008, .permissions = 0x803, .caps = 0xffff, .state = 0x00, .datatype = 0x03, .configdata = { .flags = 0x02, .clientconfig_index = 0x04 } },
   { .handle = 0x24, .uuid = 0x0000, .permissions = 0x8801, .caps = 0xffff, .state = 0x00, .datatype = 0x00, .constdata = &gattdb_attribute_field_35 },
-  { .handle = 0x25, .uuid = 0x0002, .permissions = 0x801, .caps = 0xffff, .state = 0x00, .datatype = 0x05, .characteristic = { .properties = 0x22, .char_uuid = 0x8001 } },
-  { .handle = 0x26, .uuid = 0x8001, .permissions = 0x4841, .caps = 0xffff, .state = 0x00, .datatype = 0x01, .dynamicdata = &gattdb_attribute_field_37 },
+  { .handle = 0x25, .uuid = 0x0002, .permissions = 0x801, .caps = 0xffff, .state = 0x00, .datatype = 0x05, .characteristic = { .properties = 0x20, .char_uuid = 0x8001 } },
+  { .handle = 0x26, .uuid = 0x8001, .permissions = 0x800, .caps = 0xffff, .state = 0x00, .datatype = 0x01, .dynamicdata = &gattdb_attribute_field_37 },
   { .handle = 0x27, .uuid = 0x0008, .permissions = 0x803, .caps = 0xffff, .state = 0x00, .datatype = 0x03, .configdata = { .flags = 0x02, .clientconfig_index = 0x05 } },
   { .handle = 0x28, .uuid = 0x0000, .permissions = 0x8801, .caps = 0xffff, .state = 0x00, .datatype = 0x00, .constdata = &gattdb_attribute_field_39 },
   { .handle = 0x29, .uuid = 0x0002, .permissions = 0x801, .caps = 0xffff, .state = 0x00, .datatype = 0x05, .characteristic = { .properties = 0x22, .char_uuid = 0x8002 } },

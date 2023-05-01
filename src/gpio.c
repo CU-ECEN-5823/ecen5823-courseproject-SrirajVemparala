@@ -68,10 +68,10 @@ void gpioInit()
 	GPIO_PinModeSet(LED1_port, LED1_pin, gpioModePushPull, false);
   GPIO_PinModeSet( Si7021_EN_port, Si7021_EN_pin, gpioModePushPull, true );
   GPIO_PinModeSet( PB0_port, PB0_pin, gpioModeInput, true );
-  GPIO_IntClear(0xFFFFFFFF);
+ // GPIO_IntClear(0xFFFFFFFF);
   GPIO_ExtIntConfig(PB0_port, PB0_pin, PB0_pin, true, true, true);
   GPIO_PinModeSet( PB1_port, PB1_pin, gpioModeInput, true );
-  GPIO_IntClear(0xFFFFFFFF);
+ // GPIO_IntClear(0xFFFFFFFF);
   GPIO_ExtIntConfig(PB1_port, PB1_pin, PB1_pin, true, true, true);
   GPIO_PinModeSet( PIR_SENSOR_PORT_1, PIR_SENSOR_PIN_1, gpioModeInputPullFilter, true );
   GPIO_ExtIntConfig(PIR_SENSOR_PORT_1, PIR_SENSOR_PIN_1, PIR_SENSOR_PIN_1, true, true, true);
