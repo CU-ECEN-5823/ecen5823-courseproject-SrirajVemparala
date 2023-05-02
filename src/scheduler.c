@@ -73,8 +73,8 @@ void schedulerSetCountPIR_1_detect()
 
   pir_1 = true;
   sl_bt_external_signal(evtgpiopir1intset);
-//  LOG_INFO("schedulerSetCountPIR_1_detect:pir_2:%d\n\r",pir_2);
-//  LOG_INFO("schedulerSetCountPIR_1_detect:pir_1:%d\n\r",pir_1);
+  LOG_INFO("schedulerSetCountPIR_1_detect:pir_2:%d\n\r",pir_2);
+  LOG_INFO("schedulerSetCountPIR_1_detect:pir_1:%d\n\r",pir_1);
     if(pir_2 & pir_1)
     {
         pir_2 = false;
@@ -107,13 +107,13 @@ void schedulerSetCountPIR_2_detect()
 
   pir_2 = true;
   sl_bt_external_signal(evtgpiopir2intset);
-  //LOG_INFO("schedulerSetCountPIR_2_detect:pir_2:%d\n\r",pir_2);
-  //LOG_INFO("schedulerSetCountPIR_2_detect:pir_1:%d\n\r",pir_1);
+  LOG_INFO("schedulerSetCountPIR_2_detect:pir_2:%d\n\r",pir_2);
+  LOG_INFO("schedulerSetCountPIR_2_detect:pir_1:%d\n\r",pir_1);
   if (pir_1 & pir_2)
     {
       pir_1 = false;
       pir_2 = false;
-      pir_count++;
+    pir_count++;
 
 
     }
