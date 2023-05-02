@@ -75,19 +75,19 @@ void schedulerSetCountPIR_1_detect()
   sl_bt_external_signal(evtgpiopir1intset);
   LOG_INFO("schedulerSetCountPIR_1_detect:pir_2:%d\n\r",pir_2);
   LOG_INFO("schedulerSetCountPIR_1_detect:pir_1:%d\n\r",pir_1);
-    if(pir_2 & pir_1)
-    {
-        pir_2 = false;
-        pir_1 = false;
-        if(pir_count>0)
-        {
-          pir_count--;
-        }
-
-
-      // LOG_INFO("Exit PIR count = %d\n\r", pir_count);
+  if (pir_1 & pir_2) {
+      pir_1 = false;
+      pir_2 = false;
+      if (pir_count > 0) {
+        pir_count--;
+        LOG_INFO("schedulerSetCountPIR_1_detect: pir_count: %d\n\r", pir_count);
+      } else {
+        LOG_INFO("schedulerSetCountPIR_1_detect: pir_count already zero\n\r");
+      }
+    }  else if (pir_2) {
+      pir_2 = false;
+      LOG_INFO("schedulerSetCountPIR_1_detect: pir_2_triggered\n\r");
     }
-
   CORE_EXIT_CRITICAL();
 } // schedulerSetEventXXX()
 
@@ -114,9 +114,19 @@ void schedulerSetCountPIR_2_detect()
       pir_1 = false;
       pir_2 = false;
     pir_count++;
-
-
     }
+  else if(pir_1) {
+      pir_1 = false;
+       LOG_INFO("schedulerSetCountPIR_2_detect: pir_1_triggered\n\r");
+     }
+  else if(pir_2) {
+         pir_2 = false;
+       LOG_INFO("schedulerSetCountPIR_2_detect: pir_2_triggered\n\r");
+     }
+  else
+    {
+      //
+   }
 
   CORE_EXIT_CRITICAL();
 } // schedulerSetEventXXX()
