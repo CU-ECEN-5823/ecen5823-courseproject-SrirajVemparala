@@ -22,6 +22,7 @@
 #include "src/ble_device_type.h"
 #include "src/irq.h"
 #include <stdbool.h>
+#include "lcd.h"
 // scheduler routine to set a scheduler event
 
 //#define POWER_UP_TIME 80000 // 80 milli sec in microseconds
@@ -73,21 +74,23 @@ void schedulerSetCountPIR_1_detect()
 
   pir_1 = true;
   sl_bt_external_signal(evtgpiopir1intset);
-  LOG_INFO("schedulerSetCountPIR_1_detect:pir_2:%d\n\r",pir_2);
-  LOG_INFO("schedulerSetCountPIR_1_detect:pir_1:%d\n\r",pir_1);
-  if (pir_1 & pir_2) {
-      pir_1 = false;
-      pir_2 = false;
-      if (pir_count > 0) {
-        pir_count--;
-        LOG_INFO("schedulerSetCountPIR_1_detect: pir_count: %d\n\r", pir_count);
-      } else {
-        LOG_INFO("schedulerSetCountPIR_1_detect: pir_count already zero\n\r");
-      }
-    }  else if (pir_2) {
-      pir_2 = false;
-      LOG_INFO("schedulerSetCountPIR_1_detect: pir_2_triggered\n\r");
+  displayPrintf(DISPLAY_ROW_8,"PIR_1: %d",GPIO_PinInGet(PIR_SENSOR_PORT_1, PIR_SENSOR_PIN_1));
+  displayPrintf(DISPLAY_ROW_9,"PIR_2: %d",GPIO_PinInGet(PIR_SENSOR_PORT_2, PIR_SENSOR_PIN_2));
+ // LOG_INFO("schedulerSetCountPIR_2_detect:pir_2:%d\n\r",pir_2);
+ // LOG_INFO("schedulerSetCountPIR_1_detect:pir_1:%d\n\r",pir_1);
+    if(pir_2 & pir_1)
+    {
+        pir_2 = false;
+        pir_1 = false;
+        if(pir_count>0)
+        {
+          pir_count--;
+        }
+
+
+      // LOG_INFO("Exit PIR count = %d\n\r", pir_count);
     }
+
   CORE_EXIT_CRITICAL();
 } // schedulerSetEventXXX()
 
@@ -107,26 +110,19 @@ void schedulerSetCountPIR_2_detect()
 
   pir_2 = true;
   sl_bt_external_signal(evtgpiopir2intset);
-  LOG_INFO("schedulerSetCountPIR_2_detect:pir_2:%d\n\r",pir_2);
-  LOG_INFO("schedulerSetCountPIR_2_detect:pir_1:%d\n\r",pir_1);
+  displayPrintf(DISPLAY_ROW_8,"PIR_1: %d",GPIO_PinInGet(PIR_SENSOR_PORT_1, PIR_SENSOR_PIN_1));
+  displayPrintf(DISPLAY_ROW_9,"PIR_2: %d",GPIO_PinInGet(PIR_SENSOR_PORT_2, PIR_SENSOR_PIN_2));
+
+//  LOG_INFO("schedulerSetCountPIR_2_detect:pir_2:%d\n\r",pir_2);
+//  LOG_INFO("schedulerSetCountPIR_2_detect:pir_1:%d\n\r",pir_1);
   if (pir_1 & pir_2)
     {
       pir_1 = false;
       pir_2 = false;
-    pir_count++;
+      pir_count++;
+
+
     }
-  else if(pir_1) {
-      pir_1 = false;
-       LOG_INFO("schedulerSetCountPIR_2_detect: pir_1_triggered\n\r");
-     }
-  else if(pir_2) {
-         pir_2 = false;
-       LOG_INFO("schedulerSetCountPIR_2_detect: pir_2_triggered\n\r");
-     }
-  else
-    {
-      //
-   }
 
   CORE_EXIT_CRITICAL();
 } // schedulerSetEventXXX()

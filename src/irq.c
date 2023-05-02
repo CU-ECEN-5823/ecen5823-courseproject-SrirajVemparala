@@ -55,6 +55,8 @@ void LETIMER0_IRQHandler(void)
 /**< GPIO_EVEN IRQ Handler */
 void GPIO_EVEN_IRQHandler(void)
 {
+  uint32_t gpioInt = GPIO_IntGetEnabled();
+   GPIO_IntClear(gpioInt);
  // GPIO_IntClear(0xFFFFFFFF);
    if (GPIO_PinInGet(PIR_SENSOR_PORT_1, PIR_SENSOR_PIN_1))
    {
@@ -64,8 +66,7 @@ void GPIO_EVEN_IRQHandler(void)
    {
     schedulerSetCountPIR_2_detect();
    }
-   uint32_t gpioInt = GPIO_IntGetEnabled();
-    GPIO_IntClear(gpioInt);
+
     if (gpioInt==1<<PB0_pin)
       {
    if(GPIO_PinInGet(PB0_port,PB0_pin)==1)

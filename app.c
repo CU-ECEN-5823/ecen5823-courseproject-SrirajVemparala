@@ -261,9 +261,10 @@ void sl_bt_on_event(sl_bt_msg_t *evt)
   // Some events require responses from our application code,
   // and don’t necessarily advance our state machines.
   // For A5 uncomment the next 2 function calls
+   //LOG_INFO("Event =%d\n\r",evt->data.evt_system_external_signal.extsignals);
    handle_ble_event(evt); // put this code in ble.c/.h
 
-
+   //GLIB_drawStringOnLine();
   // sequence through states driven by events
   // state_machine(evt);    // put this code in scheduler.c/.h
 #if DEVICE_IS_BLE_SERVER

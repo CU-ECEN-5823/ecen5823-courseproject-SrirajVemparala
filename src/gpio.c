@@ -74,9 +74,9 @@ void gpioInit()
  // GPIO_IntClear(0xFFFFFFFF);
   GPIO_ExtIntConfig(PB1_port, PB1_pin, PB1_pin, true, true, true);
   GPIO_PinModeSet( PIR_SENSOR_PORT_1, PIR_SENSOR_PIN_1, gpioModeInputPullFilter, true );
-  GPIO_ExtIntConfig(PIR_SENSOR_PORT_1, PIR_SENSOR_PIN_1, PIR_SENSOR_PIN_1, true, true, true);
+  GPIO_ExtIntConfig(PIR_SENSOR_PORT_1, PIR_SENSOR_PIN_1, PIR_SENSOR_PIN_1, true, false, true);
   GPIO_PinModeSet( PIR_SENSOR_PORT_2, PIR_SENSOR_PIN_2, gpioModeInputPullFilter, true );
-  GPIO_ExtIntConfig(PIR_SENSOR_PORT_2, PIR_SENSOR_PIN_2, PIR_SENSOR_PIN_2, true, true, true);
+  GPIO_ExtIntConfig(PIR_SENSOR_PORT_2, PIR_SENSOR_PIN_2, PIR_SENSOR_PIN_2, true, false, true);
  // GPIO_PinModeSet(PIR_SENSOR_PORT, PIR_SENSOR_PIN, gpioModeInputPull, 1);
 }
 
