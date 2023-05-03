@@ -74,8 +74,8 @@ void schedulerSetCountPIR_1_detect()
 
   pir_1 = true;
   sl_bt_external_signal(evtgpiopir1intset);
-  displayPrintf(DISPLAY_ROW_8,"PIR_1: %d",GPIO_PinInGet(PIR_SENSOR_PORT_1, PIR_SENSOR_PIN_1));
-  displayPrintf(DISPLAY_ROW_9,"PIR_2: %d",GPIO_PinInGet(PIR_SENSOR_PORT_2, PIR_SENSOR_PIN_2));
+  //displayPrintf(DISPLAY_ROW_8,"PIR_1: %d",GPIO_PinInGet(PIR_SENSOR_PORT_1, PIR_SENSOR_PIN_1));
+  //displayPrintf(DISPLAY_ROW_9,"PIR_2: %d",GPIO_PinInGet(PIR_SENSOR_PORT_2, PIR_SENSOR_PIN_2));
  // LOG_INFO("schedulerSetCountPIR_2_detect:pir_2:%d\n\r",pir_2);
  // LOG_INFO("schedulerSetCountPIR_1_detect:pir_1:%d\n\r",pir_1);
     if(pir_2 & pir_1)
@@ -110,8 +110,8 @@ void schedulerSetCountPIR_2_detect()
 
   pir_2 = true;
   sl_bt_external_signal(evtgpiopir2intset);
-  displayPrintf(DISPLAY_ROW_8,"PIR_1: %d",GPIO_PinInGet(PIR_SENSOR_PORT_1, PIR_SENSOR_PIN_1));
-  displayPrintf(DISPLAY_ROW_9,"PIR_2: %d",GPIO_PinInGet(PIR_SENSOR_PORT_2, PIR_SENSOR_PIN_2));
+  //displayPrintf(DISPLAY_ROW_8,"PIR_1: %d",GPIO_PinInGet(PIR_SENSOR_PORT_1, PIR_SENSOR_PIN_1));
+  //displayPrintf(DISPLAY_ROW_9,"PIR_2: %d",GPIO_PinInGet(PIR_SENSOR_PORT_2, PIR_SENSOR_PIN_2));
 
 //  LOG_INFO("schedulerSetCountPIR_2_detect:pir_2:%d\n\r",pir_2);
 //  LOG_INFO("schedulerSetCountPIR_2_detect:pir_1:%d\n\r",pir_1);
@@ -261,8 +261,8 @@ void ambient_light_state_machine(sl_bt_msg_t *evt)
   // uint32_t eventValue = evt->data.evt_system_external_signal.extsignals;
   static uint32_t current_state = i2c_init;
 
-//  if(pir_count > 0)
-//    {
+  if(pir_count > 0)
+    {
       if(SL_BT_MSG_ID(evt->header) == sl_bt_evt_system_external_signal_id)
       {
       switch(current_state)
@@ -304,8 +304,8 @@ void ambient_light_state_machine(sl_bt_msg_t *evt)
           break;
       }
     }
+   }
 }
-//}
 //}
 #else
 

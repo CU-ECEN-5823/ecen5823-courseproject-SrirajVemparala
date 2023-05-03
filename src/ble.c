@@ -312,20 +312,24 @@ void handle_ble_event(sl_bt_msg_t *evt)
         uint32_t passkey = evt->data.evt_sm_confirm_passkey.passkey;
        bleDataPtr->confirm_pass_key = true;
         displayPrintf(DISPLAY_ROW_PASSKEY,"%d",passkey);
+#if DEVICE_IS_BLE_SERVER
         displayPrintf(DISPLAY_ROW_ACTION,"Confirm with PB0");
+#else
+        displayPrintf(DISPLAY_ROW_ACTION,"Confirm with PB1");
+#endif
       }
       break;
     case sl_bt_evt_sm_bonded_id:
       bleDataPtr->bonding_complete = true;
-      displayPrintf(DISPLAY_ROW_CONNECTION, "Bonded" );
+      displayPrintf(DISPLAY_ROW_8, "Bonded" );
       //LOG_INFO("Bonded\n\r");
 #if DEVICE_IS_BLE_SERVER
-      displayPrintf(DISPLAY_ROW_9, "Button Released");
+      //displayPrintf(DISPLAY_ROW_9, "Button Released");
 #endif
       displayPrintf(DISPLAY_ROW_PASSKEY,"");
       displayPrintf(DISPLAY_ROW_ACTION,"");
 #if !(DEVICE_IS_BLE_SERVER)
-      displayPrintf(DISPLAY_ROW_9,"Button Released");
+      //displayPrintf(DISPLAY_ROW_9,"Button Released");
 #endif
       break;
 #if DEVICE_IS_BLE_SERVER
@@ -428,45 +432,6 @@ void handle_ble_event(sl_bt_msg_t *evt)
       break;
 #if DEVICE_IS_BLE_SERVER
     case sl_bt_evt_gatt_server_characteristic_status_id://Verify if data is updated in GATT server and ack received from Client
-      /*if(evt->data.evt_gatt_server_characteristic_status.client_config_flags == sl_bt_gatt_server_disable)
-        {
-          if(evt->data.evt_gatt_server_characteristic_status.characteristic == gattdb_lux_measurement)
-            {
-              bleDataPtr->flag_ok_to_send_ambient_light_indications = false;
-              gpioLed0SetOff();
-              displayPrintf(DISPLAY_ROW_TEMPVALUE,"");
-            }
-          if(evt->data.evt_gatt_server_characteristic_status.characteristic == gattdb_IR_Detection)
-            {
-              bleDataPtr->flag_ok_to_send_PIR_indications = false;
-              gpioLed1SetOff();
-            }
-          if(evt->data.evt_gatt_server_characteristic_status.characteristic == gattdb_button_state)
-            {
-              bleDataPtr->flag_ok_to_send_pb0_indications = false;
-            }
-        }
-      else if(evt->data.evt_gatt_server_characteristic_status.client_config_flags == sl_bt_gatt_server_indication)
-        {
-          if(evt->data.evt_gatt_server_characteristic_status.characteristic == gattdb_lux_measurement)
-            {
-              bleDataPtr->flag_ok_to_send_ambient_light_indications = true;
-              gpioLed0SetOn();
-            }
-          if(evt->data.evt_gatt_server_characteristic_status.characteristic == gattdb_IR_Detection)
-            {
-              bleDataPtr->flag_ok_to_send_PIR_indications = true;
-              gpioLed1SetOn();
-            }
-          if(evt->data.evt_gatt_server_characteristic_status.characteristic == gattdb_button_state)
-            {
-              bleDataPtr->flag_ok_to_send_pb0_indications = true;
-            }
-        }
-      else
-        {
-
-        }*/
       if(evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_confirmation)
         {
           bleDataPtr->flag_in_flight = false;
@@ -536,28 +501,8 @@ void handle_ble_event(sl_bt_msg_t *evt)
               PIR_measurement();
             }
         }
-      /*if(evt->data.evt_system_external_signal.extsignals == evtgpiopb0intset)
-        {
-          if(bleDataPtr->bonding_complete == true)
-            {
-              ble_send_pb0_indication(0x00);
-              displayPrintf(DISPLAY_ROW_9, "Button Released");
-            }
-        }
-      else if(evt->data.evt_system_external_signal.extsignals == evtgpiopb0intclear)
-        {
-          if(bleDataPtr->confirm_pass_key == true)
-            {
-              sl_bt_sm_passkey_confirm(bleDataPtr->connection_handle,0x01);
-            }
-          if(bleDataPtr->bonding_complete == true)
-            {
-              ble_send_pb0_indication(0x01);
-              displayPrintf(DISPLAY_ROW_9, "Button Pressed");
-            }
-        }*/
       if(evt->data.evt_system_external_signal.extsignals == evtgpiopb0intclear) {
-            displayPrintf(DISPLAY_ROW_9, "Button Pressed");
+            //displayPrintf(DISPLAY_ROW_9, "Button Pressed");
             if(bleDataPtr->bonding_complete == false)
               {
                 //Accept or reject the reported passkey confirm value
@@ -665,59 +610,10 @@ void handle_ble_event(sl_bt_msg_t *evt)
       bleDataPtr->characteristic_handle = evt->data.evt_gatt_characteristic.characteristic;
 
       break;
-  /*  case sl_bt_evt_gatt_characteristic_value_id:
-
-      // Indicates that GATT server transmitted data
-      if(evt->data.evt_gatt_characteristic_value.att_opcode == sl_bt_gatt_read_response)
-        {
-          bleDataPtr->button_value = (evt->data.evt_gatt_characteristic_value.value.data[0]);
-          if( bleDataPtr->button_value == 0x01)
-            {
-              displayPrintf(DISPLAY_ROW_9, "Button Pressed");
-            }
-          else
-            {
-
-              displayPrintf(DISPLAY_ROW_9, "Button Released");
-            }
-          //bleDataPtr->flag_in_flight = false;
-        }
-      if(evt->data.evt_gatt_characteristic_value.att_opcode == sl_bt_gatt_handle_value_indication) {
-          sc = sl_bt_gatt_send_characteristic_confirmation(bleDataPtr->connection_handle); //Connection handle
-          if(sc != SL_STATUS_OK) {
-              LOG_ERROR("sl_bt_gatt_set_characteristic_notification() returned != 0 status=0x%04x\n\r", (unsigned int)sc);
-          }
-
-          else if(evt->data.evt_gatt_characteristic_value.characteristic == gattdb_lux_measurement)
-            {
-              displayPrintf(DISPLAY_ROW_CONNECTION, "Handling Indications");
-              bleDataPtr->lux_value = (evt->data.evt_gatt_characteristic_value.value.data[2]);
-              lux_value =    bleDataPtr->lux_value | ((evt->data.evt_gatt_characteristic_value.value.data[1])<<8);
-              displayPrintf(DISPLAY_ROW_TEMPVALUE, "Lux=%d",lux_value);
-            }
-          else if(evt->data.evt_gatt_characteristic_value.characteristic == gattdb_IR_Detection)
-            {
-              bleDataPtr->pir_value = (evt->data.evt_gatt_characteristic_value.value.data[1]);
-
-              displayPrintf(DISPLAY_ROW_9,"people_count=%d",bleDataPtr->pir_value);
-            }
-          else if(evt->data.evt_gatt_characteristic_value.characteristic == gattdb_button_state)
-            {
-              bleDataPtr->button_value = (evt->data.evt_gatt_characteristic_value.value.data[1]);
-              if( bleDataPtr->button_value == 0x01)
-                {
-                  displayPrintf(DISPLAY_ROW_9, "Button Pressed");
-                }
-              else
-                {
-                  displayPrintf(DISPLAY_ROW_9, "Button Released");
-                }
-            }
-      }
-      break;*/
     case sl_bt_evt_gatt_characteristic_value_id:
           // Indicates that the value of remote GATT server was received
-          if(evt->data.evt_gatt_characteristic_value.att_opcode == sl_bt_gatt_handle_value_indication) {
+          if(evt->data.evt_gatt_characteristic_value.att_opcode == sl_bt_gatt_handle_value_indication)
+          {
               sc = sl_bt_gatt_send_characteristic_confirmation(bleDataPtr->connection_handle); //Connection handle
               if(sc != SL_STATUS_OK) {
                   LOG_ERROR("sl_bt_gatt_set_characteristic_notification() returned != 0 status=0x%04x\n\r", (unsigned int)sc);
@@ -729,6 +625,7 @@ void handle_ble_event(sl_bt_msg_t *evt)
                     bleDataPtr->lux_value = (evt->data.evt_gatt_characteristic_value.value.data[2]);
                     lux_value =    bleDataPtr->lux_value | ((evt->data.evt_gatt_characteristic_value.value.data[1])<<8);
                     displayPrintf(DISPLAY_ROW_TEMPVALUE, "Lux=%d",lux_value);
+
                   }
                 else if(evt->data.evt_gatt_characteristic_value.characteristic == gattdb_IR_Detection)
                   {
@@ -736,26 +633,23 @@ void handle_ble_event(sl_bt_msg_t *evt)
 
                     displayPrintf(DISPLAY_ROW_9,"people_count=%d",bleDataPtr->pir_value);
                   }
-              //Check for Button Press or Release with GATT DB Button State
-              else if(evt->data.evt_gatt_characteristic_value.characteristic ==gattdb_button_state )
+          }
+          if(bleDataPtr->pir_value>0)
+            {
+              if(lux_value > 5000)
                 {
-                  if(evt->data.evt_gatt_characteristic_value.value.data[1] == 0x01) {
-                      displayPrintf(DISPLAY_ROW_9, "Button Pressed");
-                  }
-                  else if(evt->data.evt_gatt_characteristic_value.value.data[1] == 0x00){
-                      displayPrintf(DISPLAY_ROW_9, "Button Released");
-                  }
+                  gpioLed0SetOn();
                 }
-          }
+              else
+                {
+                  gpioLed0SetOff();
+                }
+            }
+          else
+            {
+              gpioLed0SetOff();
+            }
           //Save the value which you have received from server
-          if(evt->data.evt_gatt_characteristic_value.att_opcode == sl_bt_gatt_read_response) {
-              if(evt->data.evt_gatt_characteristic_value.value.data[0] == 0x01) {
-                  displayPrintf(DISPLAY_ROW_9, "Button Pressed");
-              }
-              else if(evt->data.evt_gatt_characteristic_value.value.data[0] == 0x00){
-                  displayPrintf(DISPLAY_ROW_9, "Button Released");
-              }
-          }
           break;
 #endif
   }
