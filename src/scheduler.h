@@ -2,7 +2,8 @@
  * scheduler.h
  *
  *  Created on: 09-Feb-2023
- *      Author: sriraj
+ *      Author: Raghu Sai Phani Sriraj Vemparala, raghu.vemparala@colorado.edu
+ *              Rajesh Srirangam,Rajesh.Srirangam@colorado.edu
  */
 
 #ifndef SRC_SCHEDULER_H_

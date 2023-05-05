@@ -1,6 +1,6 @@
 /*
    gpio.h
-  
+
     Created on: Dec 12, 2018
         Author: Dan Walkes
 
@@ -12,8 +12,8 @@
 
  *
  * @student     Raghu Sai Phani Sriraj Vemparala, raghu.vemparala@colorado.edu
- *
- 
+ *              Rajesh Srirangam,Rajesh.Srirangam@colorado.edu
+
  */
 
 

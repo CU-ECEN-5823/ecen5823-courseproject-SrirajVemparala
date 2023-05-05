@@ -2,6 +2,7 @@
  * i2c.c
  * Date:        10-02-2022
  * Author:      Raghu Sai Phani Sriraj Vemparala, raghu.vemparala@colorado.edu
+ *              Rajesh Srirangam,Rajesh.Srirangam@colorado.edu
  * Description: This file has oscillators related information
  *
  *
@@ -31,7 +32,7 @@ void i2c_deinitialize()
   I2C_Enable(I2C0,false);
   void gpioI2C_SCL_Disable();
   void gpioI2C_SDA_Disable();
- //LOG_INFO("Deinitilaisation exit");
+  //LOG_INFO("Deinitilaisation exit");
 }
 
 /*Function Name: I2C_init()
@@ -40,21 +41,21 @@ return type: void*/
 void I2C_init()
 {
   //uint32_t i2c_bus_frequency;
-// Initialize the I2C hardware
-I2CSPM_Init_TypeDef I2C_Config = {
- .port = I2C0,
- .sclPort = gpioPortC,
- .sclPin = 10,
- .sdaPort = gpioPortC,
- .sdaPin = 11,
- .portLocationScl = 14,
- .portLocationSda = 16,
- .i2cRefFreq = 0,
- .i2cMaxFreq = I2C_FREQ_STANDARD_MAX,
- .i2cClhr = i2cClockHLRStandard
- };
- I2CSPM_Init(&I2C_Config);
- //i2c_bus_frequency = I2C_BusFreqGet(I2C0);
+  // Initialize the I2C hardware
+  I2CSPM_Init_TypeDef I2C_Config = {
+      .port = I2C0,
+      .sclPort = gpioPortC,
+      .sclPin = 10,
+      .sdaPort = gpioPortC,
+      .sdaPin = 11,
+      .portLocationScl = 14,
+      .portLocationSda = 16,
+      .i2cRefFreq = 0,
+      .i2cMaxFreq = I2C_FREQ_STANDARD_MAX,
+      .i2cClhr = i2cClockHLRStandard
+  };
+  I2CSPM_Init(&I2C_Config);
+  //i2c_bus_frequency = I2C_BusFreqGet(I2C0);
 }
 
 void i2c_veml6030_write_cmd()
@@ -76,7 +77,7 @@ void i2c_veml6030_write_cmd()
     {
       LOG_ERROR("I2C TransferInitialisation status %x write: Fail\n\r", (uint32_t)transferStatus);
     }
- // return transferStatus;
+  // return transferStatus;
 }
 
 /*Function Name: i2c_write_cmd()

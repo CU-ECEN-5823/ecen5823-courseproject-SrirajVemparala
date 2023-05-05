@@ -2,6 +2,7 @@
  * ble.h
  * Date:        25-02-2022
  * Author:      Raghu Sai Phani Sriraj Vemparala, raghu.vemparala@colorado.edu
+ *              Rajesh Srirangam,Rajesh.Srirangam@colorado.edu
  * Description: This file has BLE related information
  *
  *
@@ -22,7 +23,7 @@
 #define UINT8_TO_BITSTREAM(p, n) { *(p)++ = (uint8_t)(n); }
 
 #define UINT32_TO_BITSTREAM(p, n) { *(p)++ = (uint8_t)(n); *(p)++ = (uint8_t)((n) >> 8); \
- *(p)++ = (uint8_t)((n) >> 16); *(p)++ = (uint8_t)((n) >> 24); }
+    *(p)++ = (uint8_t)((n) >> 16); *(p)++ = (uint8_t)((n) >> 24); }
 
 #define UINT32_TO_FLOAT(m, e) (((uint32_t)(m) & 0x00FFFFFFU) | (uint32_t)((int32_t)(e) << 24))
 // BLE Data Structure, save all of our private BT data in here.

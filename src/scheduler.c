@@ -2,7 +2,7 @@
  * scheduler.c
  * Date:        10-02-2022
  * Author:      Raghu Sai Phani Sriraj Vemparala, raghu.vemparala@colorado.edu
- *              Rajesh Srirangam
+ *              Rajesh Srirangam,Rajesh.Srirangam@colorado.edu
  * Description: This file has scheduling related information
  *
  *
@@ -76,13 +76,13 @@ void schedulerSetCountPIR_1_detect()
   sl_bt_external_signal(evtgpiopir1intset);
   //displayPrintf(DISPLAY_ROW_8,"PIR_1: %d",GPIO_PinInGet(PIR_SENSOR_PORT_1, PIR_SENSOR_PIN_1));
   //displayPrintf(DISPLAY_ROW_9,"PIR_2: %d",GPIO_PinInGet(PIR_SENSOR_PORT_2, PIR_SENSOR_PIN_2));
- // LOG_INFO("schedulerSetCountPIR_2_detect:pir_2:%d\n\r",pir_2);
- // LOG_INFO("schedulerSetCountPIR_1_detect:pir_1:%d\n\r",pir_1);
-    if(pir_2 & pir_1)
+  // LOG_INFO("schedulerSetCountPIR_2_detect:pir_2:%d\n\r",pir_2);
+  // LOG_INFO("schedulerSetCountPIR_1_detect:pir_1:%d\n\r",pir_1);
+  if(pir_2 & pir_1)
     {
-        pir_2 = false;
-        pir_1 = false;
-        if(pir_count>0)
+      pir_2 = false;
+      pir_1 = false;
+      if(pir_count>0)
         {
           pir_count--;
         }
@@ -113,8 +113,8 @@ void schedulerSetCountPIR_2_detect()
   //displayPrintf(DISPLAY_ROW_8,"PIR_1: %d",GPIO_PinInGet(PIR_SENSOR_PORT_1, PIR_SENSOR_PIN_1));
   //displayPrintf(DISPLAY_ROW_9,"PIR_2: %d",GPIO_PinInGet(PIR_SENSOR_PORT_2, PIR_SENSOR_PIN_2));
 
-//  LOG_INFO("schedulerSetCountPIR_2_detect:pir_2:%d\n\r",pir_2);
-//  LOG_INFO("schedulerSetCountPIR_2_detect:pir_1:%d\n\r",pir_1);
+  //  LOG_INFO("schedulerSetCountPIR_2_detect:pir_2:%d\n\r",pir_2);
+  //  LOG_INFO("schedulerSetCountPIR_2_detect:pir_1:%d\n\r",pir_1);
   if (pir_1 & pir_2)
     {
       pir_1 = false;
@@ -150,7 +150,7 @@ void schedulerSetEventcomp1set()
   CORE_DECLARE_IRQ_STATE;
   CORE_ENTER_CRITICAL();
   //  sl_bt_external_signal(evti2ccomp1setcomplete);
- // myEvent |=evti2ccomp1setcomplete;
+  // myEvent |=evti2ccomp1setcomplete;
   sl_bt_external_signal(evti2ccomp1setcomplete);
 
   //LOG_INFO("Entering schedulerSetEventcomp1set\n\r");
@@ -264,47 +264,47 @@ void ambient_light_state_machine(sl_bt_msg_t *evt)
   if(pir_count > 0)
     {
       if(SL_BT_MSG_ID(evt->header) == sl_bt_evt_system_external_signal_id)
-      {
-      switch(current_state)
-      {
-        case i2c_init:
-          if(evt->data.evt_system_external_signal.extsignals  == evtReadAmbientsensor)
-            {
-              I2C_init();//Initialize I2C
-              //  LOG_INFO("State 1\n\r");
-              sl_power_manager_add_em_requirement(SL_POWER_MANAGER_EM1);
-              i2c_veml6030_write_cmd();
-              //timerwaitus_irq(AMBIENT_READ_WAIT_TIME);
-              current_state = i2c_read;
-            }
-          break;
-        case i2c_read://Wait for computation to complete
-          if(evt->data.evt_system_external_signal.extsignals  == evti2ctransfercomplete)
-            {
-              NVIC_DisableIRQ(I2C0_IRQn);
-              //sl_power_manager_add_em_requirement(SL_POWER_MANAGER_EM1);
-              i2c_veml6030_write_read_cmd(&read_lux_data);
-              current_state = i2c_calculate;
-            }
-          break;
-        case i2c_calculate:
-          if(evt->data.evt_system_external_signal.extsignals  == evti2ctransfercomplete)
-            {
-              NVIC_DisableIRQ(I2C0_IRQn);
-              sl_power_manager_remove_em_requirement(SL_POWER_MANAGER_EM1);
-              ambient_light_measurement(read_lux_data);
-             // LOG_INFO("i2c cal Before func pir =%d\n\r",pir_count);
+        {
+          switch(current_state)
+          {
+            case i2c_init:
+              if(evt->data.evt_system_external_signal.extsignals  == evtReadAmbientsensor)
+                {
+                  I2C_init();//Initialize I2C
+                  //  LOG_INFO("State 1\n\r");
+                  sl_power_manager_add_em_requirement(SL_POWER_MANAGER_EM1);
+                  i2c_veml6030_write_cmd();
+                  //timerwaitus_irq(AMBIENT_READ_WAIT_TIME);
+                  current_state = i2c_read;
+                }
+              break;
+            case i2c_read://Wait for computation to complete
+              if(evt->data.evt_system_external_signal.extsignals  == evti2ctransfercomplete)
+                {
+                  NVIC_DisableIRQ(I2C0_IRQn);
+                  //sl_power_manager_add_em_requirement(SL_POWER_MANAGER_EM1);
+                  i2c_veml6030_write_read_cmd(&read_lux_data);
+                  current_state = i2c_calculate;
+                }
+              break;
+            case i2c_calculate:
+              if(evt->data.evt_system_external_signal.extsignals  == evti2ctransfercomplete)
+                {
+                  NVIC_DisableIRQ(I2C0_IRQn);
+                  sl_power_manager_remove_em_requirement(SL_POWER_MANAGER_EM1);
+                  ambient_light_measurement(read_lux_data);
+                  // LOG_INFO("i2c cal Before func pir =%d\n\r",pir_count);
 
-             // LOG_INFO("i2c cal after func pir =%d\n\r",pir_count);
-             // LOG_INFO("LUX VALUE is=%d C\n\r",read_lux_data);
-              current_state = i2c_init;
-            }
-          break;
-        default:
-          break;
-      }
+                  // LOG_INFO("i2c cal after func pir =%d\n\r",pir_count);
+                  // LOG_INFO("LUX VALUE is=%d C\n\r",read_lux_data);
+                  current_state = i2c_init;
+                }
+              break;
+            default:
+              break;
+          }
+        }
     }
-   }
 }
 //}
 #else
@@ -388,7 +388,7 @@ void discovery_state_machine(sl_bt_msg_t *evt)
       break;
     case DISCOVER_PIR_CHAR_UUID:
       if(SL_BT_MSG_ID(evt->header) == sl_bt_evt_gatt_procedure_completed_id)
-       {
+        {
 
           sc = sl_bt_gatt_discover_characteristics_by_uuid(bleDataPtr->connection_handle,
                                                            bleDataPtr->service_handle,
@@ -402,7 +402,7 @@ void discovery_state_machine(sl_bt_msg_t *evt)
             {
               current_state =SET_CHAR_PIR_NOTIFY;
             }
-      }
+        }
       break;
     case SET_CHAR_PIR_NOTIFY:
       if(SL_BT_MSG_ID(evt->header) == sl_bt_evt_gatt_procedure_completed_id) {

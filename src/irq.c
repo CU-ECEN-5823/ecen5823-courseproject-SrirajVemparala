@@ -2,7 +2,7 @@
  * irq.c
  * Date:        03-02-2022
  * Author:      Raghu Sai Phani Sriraj Vemparala, raghu.vemparala@colorado.edu
- *              Rajesh Srirangam
+ *              Rajesh Srirangam,Rajesh.Srirangam@colorado.edu
  * Description: This file has interrupt handler related information
  *
  *
@@ -56,30 +56,30 @@ void LETIMER0_IRQHandler(void)
 void GPIO_EVEN_IRQHandler(void)
 {
   uint32_t gpioInt = GPIO_IntGetEnabled();
-   GPIO_IntClear(gpioInt);
- // GPIO_IntClear(0xFFFFFFFF);
-   if (GPIO_PinInGet(PIR_SENSOR_PORT_1, PIR_SENSOR_PIN_1))
-   {
-    schedulerSetCountPIR_1_detect();
-   }
-   if (GPIO_PinInGet(PIR_SENSOR_PORT_2, PIR_SENSOR_PIN_2))
-   {
-    schedulerSetCountPIR_2_detect();
-   }
+  GPIO_IntClear(gpioInt);
+  // GPIO_IntClear(0xFFFFFFFF);
+  if (GPIO_PinInGet(PIR_SENSOR_PORT_1, PIR_SENSOR_PIN_1))
+    {
+      schedulerSetCountPIR_1_detect();
+    }
+  if (GPIO_PinInGet(PIR_SENSOR_PORT_2, PIR_SENSOR_PIN_2))
+    {
+      schedulerSetCountPIR_2_detect();
+    }
 
-    if (gpioInt==1<<PB0_pin)
-      {
-   if(GPIO_PinInGet(PB0_port,PB0_pin)==1)
-   {
-       //LOG_INFO("Button Press PB0\n\r");
-       schedulerSetEventGPIOPB0set();
-   }
-   else
-   {
-      // LOG_INFO("Button Release PB0\n\r");
-       schedulerSetEventGPIOPB0clear();
-   }
-}
+  if (gpioInt==1<<PB0_pin)
+    {
+      if(GPIO_PinInGet(PB0_port,PB0_pin)==1)
+        {
+          //LOG_INFO("Button Press PB0\n\r");
+          schedulerSetEventGPIOPB0set();
+        }
+      else
+        {
+          // LOG_INFO("Button Release PB0\n\r");
+          schedulerSetEventGPIOPB0clear();
+        }
+    }
 }
 /*************
  * @Function void GPIO_EVEN_IRQHandler()
@@ -91,19 +91,19 @@ void GPIO_EVEN_IRQHandler(void)
 void GPIO_ODD_IRQHandler(void)
 {
   uint32_t gpioIntodd = GPIO_IntGetEnabled();
-GPIO_IntClear(gpioIntodd);
-if (gpioIntodd==1<<PB1_pin)
-  {
-  if(GPIO_PinInGet(PB1_port,PB1_pin)==1)
-  {
-      //LOG_INFO("Button Press PB1\n\r");
-      schedulerSetEventGPIOPB1set();
-  }
-  else  {
-     // LOG_INFO("Button Release PB1\n\r");
-      schedulerSetEventGPIOPB1clear();
-  }
-}
+  GPIO_IntClear(gpioIntodd);
+  if (gpioIntodd==1<<PB1_pin)
+    {
+      if(GPIO_PinInGet(PB1_port,PB1_pin)==1)
+        {
+          //LOG_INFO("Button Press PB1\n\r");
+          schedulerSetEventGPIOPB1set();
+        }
+      else  {
+          // LOG_INFO("Button Release PB1\n\r");
+          schedulerSetEventGPIOPB1clear();
+      }
+    }
 }
 /*************
  * @Function void I2C0_IRQHandler()

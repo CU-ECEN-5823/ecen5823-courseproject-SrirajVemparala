@@ -2,7 +2,8 @@
  * i2c.h
  *
  *  Created on: 09-Feb-2023
- *      Author: srira
+ *      Author: Rajesh Srirangam,Rajesh.Srirangam@colorado.edu
+ *               Raghu Sai Phani Sriraj Vemparala, raghu.vemparala@colorado.edu
  */
 
 #ifndef SRC_I2C_H_

@@ -1,6 +1,6 @@
 /*
   gpio.c
- 
+
     Created on: Dec 12, 2018
     Author: Dan Walkes
     Updated by Dave Sluiter Dec 31, 2020. Minor edits with #defines.
@@ -8,8 +8,8 @@
 
  *
  * @student     Raghu Sai Phani Sriraj Vemparala, raghu.vemparala@colorado.edu
- *
- 
+ *              Rajesh Srirangam,Rajesh.Srirangam@colorado.edu
+
  */
 
 
@@ -55,7 +55,7 @@ return type: void*/
 void gpioInit()
 {
 
-/*Setting the drive for the Port F to strong*/
+  /*Setting the drive for the Port F to strong*/
   //GPIO_DriveStrengthSet(LED0_port, gpioDriveStrengthStrongAlternateStrong);
   /*Setting the drive for the Port F to weak*/
   GPIO_DriveStrengthSet(LED0_port, gpioDriveStrengthWeakAlternateWeak);
@@ -68,16 +68,16 @@ void gpioInit()
   GPIO_PinModeSet(LED1_port, LED1_pin, gpioModePushPull, false);
   GPIO_PinModeSet( Si7021_EN_port, Si7021_EN_pin, gpioModePushPull, true );
   GPIO_PinModeSet( PB0_port, PB0_pin, gpioModeInput, true );
- // GPIO_IntClear(0xFFFFFFFF);
+  // GPIO_IntClear(0xFFFFFFFF);
   GPIO_ExtIntConfig(PB0_port, PB0_pin, PB0_pin, true, true, true);
   GPIO_PinModeSet( PB1_port, PB1_pin, gpioModeInput, true );
- // GPIO_IntClear(0xFFFFFFFF);
+  // GPIO_IntClear(0xFFFFFFFF);
   GPIO_ExtIntConfig(PB1_port, PB1_pin, PB1_pin, true, true, true);
   GPIO_PinModeSet( PIR_SENSOR_PORT_1, PIR_SENSOR_PIN_1, gpioModeInputPullFilter, true );
   GPIO_ExtIntConfig(PIR_SENSOR_PORT_1, PIR_SENSOR_PIN_1, PIR_SENSOR_PIN_1, true, false, true);
   GPIO_PinModeSet( PIR_SENSOR_PORT_2, PIR_SENSOR_PIN_2, gpioModeInputPullFilter, true );
   GPIO_ExtIntConfig(PIR_SENSOR_PORT_2, PIR_SENSOR_PIN_2, PIR_SENSOR_PIN_2, true, false, true);
- // GPIO_PinModeSet(PIR_SENSOR_PORT, PIR_SENSOR_PIN, gpioModeInputPull, 1);
+  // GPIO_PinModeSet(PIR_SENSOR_PORT, PIR_SENSOR_PIN, gpioModeInputPull, 1);
 }
 
 /*Function Name: gpioLed0SetOn()
@@ -147,11 +147,11 @@ void gpioSi7021_SDA_Disable()
 void gpioSetDisplayExtcomin(bool extcomin_state)
 {
   if(extcomin_state == true)
-  {
+    {
       GPIO_PinOutSet(LCD_PORT, LCD_PIN);
-  }
+    }
   else
-  {
+    {
       GPIO_PinOutClear(LCD_PORT, LCD_PIN);
-  }
+    }
 }
